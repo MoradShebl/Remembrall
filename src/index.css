@@ -108,6 +108,7 @@ button:disabled {
   border-radius: 50%;
   border: none;
   transition: all 0.3s ease-in-out;
+  max-height: 35px;
 }
 
 .location:hover {
@@ -156,6 +157,7 @@ button:disabled {
   padding: 5px 10px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  align-items: center;
 }
 
 .item.collapsed {
@@ -174,6 +176,7 @@ button:disabled {
   justify-content: center;
   align-items: center;
   margin-top: auto;
+  gap: 10px;
 }
 
 .add-button {
@@ -250,6 +253,7 @@ button:disabled {
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s var(--cubic-bezier), box-shadow 0.3s var(--cubic-bezier);
+  width: 100%;
 }
 
 .add-item-screen input:focus {
@@ -280,10 +284,16 @@ button:disabled {
   outline: none;
   box-shadow: 0 0 0 3px rgba(122, 129, 255, 0.4);
 }
+.add-item-buttons{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
 .location-input {
   border: none;
   outline: none;
   background-color: transparent;
+  max-width: 100px;
 }
 .location-wrapper{
   display: flex;
@@ -309,4 +319,10 @@ button:disabled {
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+.time-informations-wrapper{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
 }

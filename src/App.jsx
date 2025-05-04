@@ -8,7 +8,6 @@ function App() {
         <div className="container">
           <h1>Forgetify</h1>
           <Recent />
-          
         </div>
       </main>
     </>

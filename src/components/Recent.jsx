@@ -13,6 +13,9 @@ function Recent() {
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
+  const [time, setTime] = useState("");
+  const [addTime, setAddTime] = useState(false);
+  const [addType, setAddType] = useState("item");
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
@@ -28,24 +31,60 @@ function Recent() {
       return;
     }
     if (items.some((item) => item.name === name)) {
-      alert("Item with this name already exists you can change the location from the list");
+      alert(
+        "Item with this name already exists you can change the location from the list"
+      );
       return;
     }
     setItems([
       ...items,
       { id: items.length + 1, name: name, location: location },
     ]);
+    setAddType("item")
     setAddItemScreen(false);
     setName("");
     setLocation("");
   };
 
+  const handleAddTime = (name, location, time) => {
+    if (!name || !time) {
+      alert("Please enter a name and time");
+      return;
+    }
+    if (items.some((item) => item.name === name)) {
+      alert(
+        "Item with this name already exists you can change the location from the list"
+      );
+      return;
+    }
+    setItems([
+      ...items,
+      { id: items.length + 1, name: name, location: location ? location : "Online", time: time },
+    ]);
+    setAddType("time")
+    setAddItemScreen(false);
+    setName("");
+    setLocation("");
+    setTime("");
+  };
+
   const handleLocationChange = (id, newLocation) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, location: newLocation } : item
-      )
-    );
+    setItems(items.map(item => item.id === id ? { ...item, location: newLocation } : item));
+  };
+
+  const handleTimeChange = (id, newTime) => {
+    setItems(items.map(item => item.id === id ? { ...item, time: newTime } : item));
+  };
+
+  const removeAddingList = () => {
+    setAddItemScreen(false) 
+    setAddTime(false)
+    console.log(addTime)
+  };
+
+  const handleAddTimeScreen = () => {
+    setAddItemScreen(true);
+    setAddTime(true);
   };
 
   const handleLocation = async () => {
@@ -54,13 +93,15 @@ function Recent() {
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
             const data = await response.json();
-            const placeName = data.display_name || 'Unknown location';
+            const placeName = data.display_name || "Unknown location";
             setLocation(placeName);
           } catch (error) {
             console.error("Error fetching location name:", error);
-            setLocation('Error fetching location');
+            setLocation("Error fetching location");
           }
         },
         (error) => {
@@ -73,14 +114,14 @@ function Recent() {
   };
 
   useEffect(() => {
-    const storedItems = localStorage.getItem('items');
+    const storedItems = localStorage.getItem("items");
     if (storedItems) {
       setItems(JSON.parse(storedItems));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('items', JSON.stringify(items));
+    localStorage.setItem("items", JSON.stringify(items));
   }, [items]);
 
   useEffect(() => {
@@ -104,21 +145,31 @@ function Recent() {
   return (
     <>
       <div className="item-container">
-        <h2>Your Items:</h2>
+        <h2>Your Folks:</h2>
         {items.map((item) => (
           <Card
             key={item.id}
             name={item.name}
             location={item.location}
+            time={item.time}
             onRemove={() => handleRemove(item.id)}
             onLocationChange={(newLocation) =>
               handleLocationChange(item.id, newLocation)
+            }
+            onTimeChange={(newTime) =>
+              handleTimeChange(item.id, newTime)
             }
           />
         ))}
         <div className="add">
           <button className="add-button" onClick={() => setAddItemScreen(true)}>
-            Add new
+            Add item
+          </button>
+          <button
+            className="add-button"
+            onClick={() => handleAddTimeScreen()}
+          >
+            Add time
           </button>
         </div>
       </div>
@@ -126,20 +177,27 @@ function Recent() {
         <div className="bg">
           <div className="add-item-screen">
             <div className="header">
-              <h2>Add new item</h2>
-              <button className="close" onClick={() => setAddItemScreen(false)}>
+              <h2>Add new {addTime ? "time" : "item"}</h2>
+              <button className="close" onClick={() => removeAddingList()}>
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
             <input
               type="text"
-              placeholder="Item name"
+              placeholder={addTime ? "Time name" : "Item name"}
               onChange={(e) => setName(e.target.value)}
             />
+            {addTime && (
+              <input
+                type="time"
+                placeholder="Time"
+                onChange={(e) => setTime(e.target.value)}
+              />
+            )}
             <div className="location-wrapper">
               <input
                 type="text"
-                placeholder="Item location"
+                placeholder={addTime ? "Time location (Online by default)" : "Item location"}
                 onChange={(e) => setLocation(e.target.value)}
                 value={location}
               />
@@ -158,12 +216,14 @@ function Recent() {
             ) : (
               <p>Loading map...</p>
             )}
-            <button
-              className="add-button add-item-screen-button"
-              onClick={() => handleAddItem(name, location)}
-            >
-              Add item
-            </button>
+            <div className="add-item-buttons">
+              <button
+                className="add-button add-item-screen-button"
+                onClick={() => addType === 'item' ? handleAddTime(name, location, time) : handleAddItem(name, location)}
+              >
+                Add {addType === 'item' ? "time" : "item"}
+              </button>
+            </div>
           </div>
         </div>
       )}
