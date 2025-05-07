@@ -1,7 +1,6 @@
-import Recent from "./components/Recent.jsx"
+import Recent from "./components/Recent.jsx";
 
 function App() {
-
   return (
     <>
       <main>
@@ -11,7 +10,7 @@ function App() {
         </div>
       </main>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

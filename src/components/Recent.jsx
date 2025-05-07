@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import Card from "./components/Card.jsx";
+import Card from "./Card.jsx";
+import SpeechRecognition from "./speechRecognition.jsx";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,7 +16,6 @@ function Recent() {
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [addTime, setAddTime] = useState(false);
-  const [addType, setAddType] = useState("item");
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
@@ -40,7 +40,6 @@ function Recent() {
       ...items,
       { id: items.length + 1, name: name, location: location },
     ]);
-    setAddType("item")
     setAddItemScreen(false);
     setName("");
     setLocation("");
@@ -59,9 +58,13 @@ function Recent() {
     }
     setItems([
       ...items,
-      { id: items.length + 1, name: name, location: location ? location : "Online", time: time },
+      {
+        id: items.length + 1,
+        name: name,
+        location: location ? location : "Online",
+        time: time,
+      },
     ]);
-    setAddType("time")
     setAddItemScreen(false);
     setName("");
     setLocation("");
@@ -69,17 +72,23 @@ function Recent() {
   };
 
   const handleLocationChange = (id, newLocation) => {
-    setItems(items.map(item => item.id === id ? { ...item, location: newLocation } : item));
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, location: newLocation } : item
+      )
+    );
   };
 
   const handleTimeChange = (id, newTime) => {
-    setItems(items.map(item => item.id === id ? { ...item, time: newTime } : item));
+    setItems(
+      items.map((item) => (item.id === id ? { ...item, time: newTime } : item))
+    );
   };
 
   const removeAddingList = () => {
-    setAddItemScreen(false) 
-    setAddTime(false)
-    console.log(addTime)
+    setAddItemScreen(false);
+    setAddTime(false);
+    console.log(addTime);
   };
 
   const handleAddTimeScreen = () => {
@@ -156,21 +165,19 @@ function Recent() {
             onLocationChange={(newLocation) =>
               handleLocationChange(item.id, newLocation)
             }
-            onTimeChange={(newTime) =>
-              handleTimeChange(item.id, newTime)
-            }
+            onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
           />
         ))}
         <div className="add">
           <button className="add-button" onClick={() => setAddItemScreen(true)}>
             Add item
           </button>
-          <button
-            className="add-button"
-            onClick={() => handleAddTimeScreen()}
-          >
+          <button className="add-button" onClick={() => handleAddTimeScreen()}>
             Add time
           </button>
+        </div>
+        <div className="speech-recognition-container">
+          <SpeechRecognition onAddItem={handleAddItem} />
         </div>
       </div>
       {addItemScreen && (
@@ -197,7 +204,11 @@ function Recent() {
             <div className="location-wrapper">
               <input
                 type="text"
-                placeholder={addTime ? "Time location (Online by default)" : "Item location"}
+                placeholder={
+                  addTime
+                    ? "Time location (Online by default)"
+                    : "Item location"
+                }
                 onChange={(e) => setLocation(e.target.value)}
                 value={location}
               />
@@ -219,9 +230,13 @@ function Recent() {
             <div className="add-item-buttons">
               <button
                 className="add-button add-item-screen-button"
-                onClick={() => addType === 'item' ? handleAddTime(name, location, time) : handleAddItem(name, location)}
+                onClick={() =>
+                  addTime
+                    ? handleAddTime(name, location, time)
+                    : handleAddItem(name, location)
+                }
               >
-                Add {addType === 'item' ? "time" : "item"}
+                Add {addTime ? "time" : "item"}
               </button>
             </div>
           </div>
