@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Card from "./Card.jsx";
-import SpeechRecognition from "./speechRecognition.jsx";
+import SpeechRecognition from "./voiceRecognition.jsx";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
