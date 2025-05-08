@@ -47,6 +47,7 @@ const SpeechRecognition = ({ onAddItem }) => {
             : "Click the button to start listening"
         }
         onClick={cancelistening}
+        readOnly
       />
       <button
         style={{

@@ -5,7 +5,7 @@ function App() {
     <>
       <main>
         <div className="container">
-          <h1>Forgetify</h1>
+          <h1>Remembrall</h1>
           <Recent />
         </div>
       </main>
