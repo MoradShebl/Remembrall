@@ -31,6 +31,11 @@ const SpeechRecognition = ({ onAddItem }) => {
     onAddItem(words[0], words.slice(1).join(" "));
   };
 
+  const cancelistening = () =>{
+    setStatus("not listening")
+    setText("")
+  }
+
   return (
     <div className="speech-recognition">
       <input
@@ -41,6 +46,7 @@ const SpeechRecognition = ({ onAddItem }) => {
             ? "Listening..."
             : "Click the button to start listening"
         }
+        onClick={cancelistening}
       />
       <button
         style={{
