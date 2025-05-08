@@ -34,12 +34,13 @@ const Card = ({
         <div className="dropdown">
           <button
             className={`dropdown-button ${rotated ? "rotated" : ""}`}
+            aria-label="Open options menu"
             onClick={() => {
               setExpanded(!expanded);
               setRotated(!rotated);
             }}
           >
-            <FontAwesomeIcon icon={faCaretDown} />
+            <FontAwesomeIcon aria-hidden="true" icon={faCaretDown} />
           </button>
           <div className="item-info-header">
             <p>{name}</p>
@@ -67,14 +68,15 @@ const Card = ({
               />
             </>
           )}
-          <button className="remove" onClick={() => setIsDeleting(true)}>
-            <FontAwesomeIcon icon={faTrash} />
+          <button aria-label="Remove item" className="remove" onClick={() => setIsDeleting(true)}>
+            <FontAwesomeIcon aria-hidden="true" icon={faTrash} />
           </button>
         </div>
         <select
           value={catagory}
           onChange={(e) => onCatagoryChange(e.target.value)}
           className="catagory-select"
+          aria-label="Select catagory"
         >
           {catagories.map((cata) => (
             <>

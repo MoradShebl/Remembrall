@@ -280,7 +280,7 @@ function Recent() {
           </button>
         </div>
         <div className="speech-recognition-container">
-          <SpeechRecognition onAddItem={handleAddItem} />
+          <SpeechRecognition aria-label="Start speech recognition" onAddItem={handleAddItem} />
         </div>
       </div>
       {addItemScreen && (
