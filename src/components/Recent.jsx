@@ -4,28 +4,43 @@ import SpeechRecognition from "./voiceRecognition.jsx";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationDot, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLocationDot,
+  faXmark,
+  faBriefcase,
+  faHome,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 function Recent() {
   const [items, setItems] = useState([
     {
       id: 1,
-      name: "Wallet (it's example)",
+      name: "Wallet (Example)",
       location: "On the bed",
       catagory: "Personal",
     },
     {
       id: 2,
-      name: "Keys (it's example)",
+      name: "Keys (Example)",
       location: "In the drawer",
       catagory: "Personal",
     },
   ]);
 
   const catagories = [
-    { name: "Personal", emoji: "🗿" },
-    { name: "Work", emoji: "💼" },
-    { name: "Home", emoji: "🏡" },
+    {
+      name: "Personal",
+      emoji: <FontAwesomeIcon className="catagory-icon" icon={faUser} />,
+    },
+    {
+      name: "Work",
+      emoji: <FontAwesomeIcon className="catagory-icon" icon={faBriefcase} />,
+    },
+    {
+      name: "Home",
+      emoji: <FontAwesomeIcon className="catagory-icon" icon={faHome} />,
+    },
   ];
 
   const [name, setName] = useState("");
@@ -33,10 +48,14 @@ function Recent() {
   const [time, setTime] = useState("");
   const [addTime, setAddTime] = useState(false);
   const [catagory, setCatagory] = useState("Personal");
+  const [searchtype, setSearchType] = useState("name")
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
   const [userPosition, setUserPosition] = useState(null);
+
+  const [currentFilter, setCurrentFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleRemove = (id) => {
     setItems(items.filter((item) => item.id !== id));
@@ -153,6 +172,35 @@ function Recent() {
     );
   };
 
+  const handleCatagoryFilterChange = (filter) => {
+    setCurrentFilter(filter);
+  };
+
+  const getFilteredItems = () => {
+    let filtered = currentFilter === "All" 
+      ? items 
+      : items.filter((item) => item.catagory === currentFilter);
+    
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter((item) => {
+        // Use the searchtype state to determine which property to search in
+        const propertyToSearch = searchtype.toLowerCase();
+        if (propertyToSearch === "name" && item.name) {
+          return item.name.toLowerCase().includes(searchTerm.toLowerCase());
+        } else if (propertyToSearch === "location" && item.location) {
+          return item.location.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+        return false;
+      });
+    }
+    
+    return filtered;
+  };
+
+  const handleSearchChange = (e) =>{
+    setSearchTerm(e.target.value);
+  }
+
   useEffect(() => {
     const storedItems = localStorage.getItem("items");
     if (storedItems) {
@@ -186,25 +234,43 @@ function Recent() {
     <>
       <div className="item-container">
         <h2>Your Folks:</h2>
-        {items.map((item) => (
-          <Card
-            key={item.id}
-            name={item.name}
-            location={item.location}
-            time={item.time}
-            catagory={item.catagory}
-            catagories={catagories}
-            emoji={item.emoji}
-            onRemove={() => handleRemove(item.id)}
-            onLocationChange={(newLocation) =>
-              handleLocationChange(item.id, newLocation)
-            }
-            onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
-            onCatagoryChange={(newCatagory) =>
-              handleCatagoryChange(item.id, newCatagory)
-            }
-          />
-        ))}
+        <div className="search-bar">
+          <input type="text" placeholder="Search..." className="catagory-select search-input" onChange={(e) => handleSearchChange(e)} value={searchTerm} />
+          <select className="select-what-search-for" onChange={(e) => setSearchType(e.target.value)}>
+            <option value="name">Name</option>
+            <option value="location">Location</option>
+          </select>
+        </div>
+        <select onChange={(e) => handleCatagoryFilterChange(e.target.value)} className="catagories-filter-select catagory-select">
+          <option value="All">All Categories</option>
+          <option value="Personal">Personal</option>
+          <option value="Work">Work</option>
+          <option value="Home">Home</option>
+        </select>
+        {getFilteredItems().length === 0 ? (
+          <div className="empty">
+            <p>No Folks here!</p>
+          </div>
+        ) : (
+          getFilteredItems().map((item) => (
+            <Card
+              key={item.id}
+              name={item.name}
+              location={item.location}
+              time={item.time}
+              catagory={item.catagory}
+              catagories={catagories}
+              onRemove={() => handleRemove(item.id)}
+              onLocationChange={(newLocation) =>
+                handleLocationChange(item.id, newLocation)
+              }
+              onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
+              onCatagoryChange={(newCatagory) =>
+                handleCatagoryChange(item.id, newCatagory)
+              }
+            />
+          ))
+        )}
         <div className="add">
           <button className="add-button" onClick={() => setAddItemScreen(true)}>
             Add item
@@ -253,7 +319,10 @@ function Recent() {
                 <FontAwesomeIcon icon={faLocationDot} />
               </button>
             </div>
-            <select onChange={(e) => setCatagory(e.target.value)}>
+            <select
+              className="catagory-select add-item-select"
+              onChange={(e) => setCatagory(e.target.value)}
+            >
               {catagories.map((cata) => (
                 <>
                   <option>{cata.name}</option>

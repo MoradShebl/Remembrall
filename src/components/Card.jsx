@@ -18,17 +18,10 @@ const Card = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [emoji, setEmoji] = useState(false);
 
-  //this need some tweaks
-
   useEffect(() => {
-    if (catagory === "Personal") {
-      setEmoji("🗿");
-    } else if (catagory === "Work") {
-      setEmoji("💼");
-    } else if (catagory === "Home") {
-      setEmoji("🏡");
-    }
-  }, [catagory, emoji]);
+    const matched = catagories.find((c) => c.name === catagory);
+    setEmoji(matched ? matched.emoji : "");
+  }, [catagories, catagory]);
 
   return (
     <>
@@ -50,7 +43,9 @@ const Card = ({
           </button>
           <div className="item-info-header">
             <p>{name}</p>
-            <span>{emoji}</span>
+            <div className="catagory-emoji-wrapper">
+              <span>{emoji}</span>
+            </div>
           </div>
         </div>
         <div className="item-info">
