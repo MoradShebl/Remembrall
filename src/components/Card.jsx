@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faTrash } from "@fortawesome/free-solid-svg-icons";
 
@@ -6,13 +6,30 @@ const Card = ({
   name,
   location,
   time,
+  catagory,
+  catagories,
   onRemove,
   onLocationChange,
   onTimeChange,
+  onCatagoryChange,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [rotated, setRotated] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [emoji, setEmoji] = useState(false);
+
+  //this need some tweaks
+
+  useEffect(() => {
+    if (catagory === "Personal") {
+      setEmoji("🗿");
+    } else if (catagory === "Work") {
+      setEmoji("💼");
+    } else if (catagory === "Home") {
+      setEmoji("🏡");
+    }
+  }, [catagory, emoji]);
+
   return (
     <>
       <div
@@ -31,7 +48,10 @@ const Card = ({
           >
             <FontAwesomeIcon icon={faCaretDown} />
           </button>
-          <p>{name}</p>
+          <div className="item-info-header">
+            <p>{name}</p>
+            <span>{emoji}</span>
+          </div>
         </div>
         <div className="item-info">
           {time ? (
@@ -44,16 +64,29 @@ const Card = ({
               <p>{location}</p>
             </div>
           ) : (
-            <input
-              className="location-input"
-              value={location}
-              onChange={(e) => onLocationChange(e.target.value)}
-            />
+            <>
+              <input
+                className="location-input"
+                value={location}
+                onChange={(e) => onLocationChange(e.target.value)}
+              />
+            </>
           )}
           <button className="remove" onClick={() => setIsDeleting(true)}>
             <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
+        <select
+          value={catagory}
+          onChange={(e) => onCatagoryChange(e.target.value)}
+          className="catagory-select"
+        >
+          {catagories.map((cata) => (
+            <>
+              <option>{cata.name}</option>
+            </>
+          ))}
+        </select>
       </div>
     </>
   );

@@ -8,14 +8,31 @@ import { faLocationDot, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 function Recent() {
   const [items, setItems] = useState([
-    { id: 1, name: "Wallet (it's example)", location: "On the bed" },
-    { id: 2, name: "Keys (it's example)", location: "In the drawer" },
+    {
+      id: 1,
+      name: "Wallet (it's example)",
+      location: "On the bed",
+      catagory: "Personal",
+    },
+    {
+      id: 2,
+      name: "Keys (it's example)",
+      location: "In the drawer",
+      catagory: "Personal",
+    },
   ]);
+
+  const catagories = [
+    { name: "Personal", emoji: "🗿" },
+    { name: "Work", emoji: "💼" },
+    { name: "Home", emoji: "🏡" },
+  ];
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [addTime, setAddTime] = useState(false);
+  const [catagory, setCatagory] = useState("Personal");
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
@@ -38,7 +55,12 @@ function Recent() {
     }
     setItems([
       ...items,
-      { id: items.length + 1, name: name, location: location },
+      {
+        id: items.length + 1,
+        name: name,
+        location: location,
+        catagory: catagory,
+      },
     ]);
     setAddItemScreen(false);
     setName("");
@@ -62,6 +84,7 @@ function Recent() {
         id: items.length + 1,
         name: name,
         location: location ? location : "Online",
+        catagory: catagory,
         time: time,
       },
     ]);
@@ -122,6 +145,14 @@ function Recent() {
     }
   };
 
+  const handleCatagoryChange = (id, newCatagory) => {
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, catagory: newCatagory } : item
+      )
+    );
+  };
+
   useEffect(() => {
     const storedItems = localStorage.getItem("items");
     if (storedItems) {
@@ -161,11 +192,17 @@ function Recent() {
             name={item.name}
             location={item.location}
             time={item.time}
+            catagory={item.catagory}
+            catagories={catagories}
+            emoji={item.emoji}
             onRemove={() => handleRemove(item.id)}
             onLocationChange={(newLocation) =>
               handleLocationChange(item.id, newLocation)
             }
             onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
+            onCatagoryChange={(newCatagory) =>
+              handleCatagoryChange(item.id, newCatagory)
+            }
           />
         ))}
         <div className="add">
@@ -216,6 +253,13 @@ function Recent() {
                 <FontAwesomeIcon icon={faLocationDot} />
               </button>
             </div>
+            <select onChange={(e) => setCatagory(e.target.value)}>
+              {catagories.map((cata) => (
+                <>
+                  <option>{cata.name}</option>
+                </>
+              ))}
+            </select>
             {userPosition ? (
               <MapContainer
                 center={userPosition}
