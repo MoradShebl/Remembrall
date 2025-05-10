@@ -12,7 +12,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-function Recent() {
+function Recent({darkMode}) {
   const [items, setItems] = useState([
     {
       id: 1,
@@ -232,7 +232,7 @@ function Recent() {
 
   return (
     <>
-      <div className="item-container">
+      <div className="item-container" data-theme={darkMode ? "dark" : "light"}>
         <h2>Your Folks:</h2>
         <div className="search-bar">
           <input type="text" placeholder="Search..." className="catagory-select search-input" onChange={(e) => handleSearchChange(e)} value={searchTerm} />

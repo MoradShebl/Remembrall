@@ -6,10 +6,15 @@
 
 :root {
   --primary-color: #f8f8f8;
+  --primary-dark-color: #121212;
   --secondary-color: #edf0e5;
+  --secondary-dark-color: #121212;
   --accent-color: #7a81ff;
+  --accent-dark-color: #7a81ff;
   --hover-color: #646cff;
+  --hover-dark-color: #646cff;
   --error-color: #dc2626;
+  --error-dark-color: #dc2626;
   --green-color: #26dc26;
   --cubic-bezier: cubic-bezier(0.14, 0.66, 0.79, 1.03);
 }
@@ -427,4 +432,80 @@ button:disabled {
   border-radius: 0px 10px 10px 0px;
   background-color: var(--secondary-color);
   padding-left: 10px;
+}
+header{
+  width: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+}
+.mode-icon{
+  color: var(--accent-color);
+}
+
+[data-theme="dark"]{
+  --primary-color: var(--primary-dark-color) !important;
+  --secondary-color: var(--secondary-dark-color) !important;
+  --accent-color: var(--accent-dark-color) !important;
+  --hover-color: var(--hover-dark-color) !important;
+  --error-color: var(--error-dark-color) !important;
+  color: #e2e8f0 !important;
+  background-color: var(--primary-dark-color) !important;
+}
+
+[data-theme="dark"] .item {
+  background-color: var(--secondary-dark-color) !important;
+  border: 1px solid #2d3748 !important;
+}
+
+[data-theme="dark"] .item-info {
+  background-color: var(--secondary-dark-color) !important;
+}
+
+[data-theme="dark"] .dropdown-button,
+[data-theme="dark"] .remove,
+[data-theme="dark"] .location-input,
+[data-theme="dark"] .catagory-select,
+[data-theme="dark"] .search-input,
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+  background-color: #2d3748 !important;
+  color: #e2e8f0 !important;
+  border-color: #4a5568 !important;
+}
+
+[data-theme="dark"] .search-bar {
+  background-color: var(--secondary-dark-color) !important;
+}
+
+[data-theme="dark"] .item-info-header p,
+[data-theme="dark"] .time-informations-wrapper p {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .container {
+  background-color: var(--primary-dark-color) !important;
+}
+
+[data-theme="dark"] header {
+  background-color: var(--secondary-dark-color) !important;
+  border-bottom: 1px solid #2d3748 !important;
+}
+
+[data-theme="dark"] header h1 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .content {
+  background-color: var(--primary-dark-color) !important;
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .item-container {
+  background-color: var(--primary-dark-color) !important;
+}
+
+[data-theme="dark"] h2 {
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid #2d3748 !important;
 }
