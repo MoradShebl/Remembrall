@@ -12,7 +12,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-function Recent({darkMode}) {
+function Recent({darkMode, speechLanguage}) {
   const [items, setItems] = useState([
     {
       id: 1,
@@ -280,7 +280,7 @@ function Recent({darkMode}) {
           </button>
         </div>
         <div className="speech-recognition-container">
-          <SpeechRecognition aria-label="Start speech recognition" onAddItem={handleAddItem} />
+          <SpeechRecognition aria-label="Start speech recognition" onAddItem={handleAddItem} speechLanguage={speechLanguage} />
         </div>
       </div>
       {addItemScreen && (
