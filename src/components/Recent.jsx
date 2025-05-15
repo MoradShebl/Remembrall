@@ -89,7 +89,7 @@ function Recent({darkMode, speechLanguage, categories}) {
     setItems(items.filter((item) => item.id !== id));
   };
 
-  const handleAddItem = (name, location) => {
+  const handleAddItem = (name, location, category = catagory) => {
     if (!name || !location) {
       alert("Please enter a name and location");
       return;
@@ -100,13 +100,19 @@ function Recent({darkMode, speechLanguage, categories}) {
       );
       return;
     }
+    
+    // Validate that the category exists in our categories list
+    const validCategory = categories ? 
+      categories.find(cat => cat.name.toLowerCase() === category.toLowerCase())?.name : 
+      catagories.find(cat => cat.name.toLowerCase() === category.toLowerCase())?.name;
+    
     setItems([
       ...items,
       {
         id: items.length + 1,
         name: name,
         location: location,
-        catagory: catagory,
+        catagory: validCategory || catagory, // Use validated category or default
       },
     ]);
     setAddItemScreen(false);
@@ -139,7 +145,6 @@ function Recent({darkMode, speechLanguage, categories}) {
     setName("");
     setLocation("");
     setTime("");
-    setCatagory("Personal")
   };
 
   const handleLocationChange = (id, newLocation) => {
@@ -308,7 +313,12 @@ function Recent({darkMode, speechLanguage, categories}) {
           </button>
         </div>
         <div className="speech-recognition-container">
-          <SpeechRecognition aria-label="Start speech recognition" onAddItem={handleAddItem} speechLanguage={speechLanguage} />
+          <SpeechRecognition 
+            aria-label="Start speech recognition" 
+            onAddItem={handleAddItem} 
+            speechLanguage={speechLanguage}
+            categories={categories || catagories.map(cat => ({ name: cat.name, icon: cat.name === "Personal" ? "faUser" : cat.name === "Work" ? "faBriefcase" : "faHome" }))} 
+          />
         </div>
       </div>
       {addItemScreen && (
