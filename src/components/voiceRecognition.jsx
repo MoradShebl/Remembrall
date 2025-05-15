@@ -226,7 +226,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
               </div>
               
               <div className="help-section">
-                <h4>Category Commands</h4>
+                <h4>Category Commands (Beta)</h4>
                 <ul>
                   <li><strong>"Add keys to drawer in Work category"</strong></li>
                   <li><strong>"Add laptop in office to Home category"</strong></li>
