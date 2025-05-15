@@ -10,9 +10,16 @@ import {
   faBriefcase,
   faHome,
   faUser,
+  faBook,
+  faLaptop,
+  faPhone,
+  faCar,
+  faKey,
+  faWallet,
+  faGlasses,
 } from "@fortawesome/free-solid-svg-icons";
 
-function Recent({darkMode, speechLanguage}) {
+function Recent({darkMode, speechLanguage, categories}) {
   const [items, setItems] = useState([
     {
       id: 1,
@@ -28,7 +35,28 @@ function Recent({darkMode, speechLanguage}) {
     },
   ]);
 
-  const catagories = [
+  // Get the appropriate FontAwesome icon based on the icon name
+  const getIconFromName = (iconName) => {
+    switch(iconName) {
+      case "faUser": return faUser;
+      case "faBriefcase": return faBriefcase;
+      case "faHome": return faHome;
+      case "faBook": return faBook;
+      case "faLaptop": return faLaptop;
+      case "faPhone": return faPhone;
+      case "faCar": return faCar;
+      case "faKey": return faKey;
+      case "faWallet": return faWallet;
+      case "faGlasses": return faGlasses;
+      default: return faUser; // Default fallback
+    }
+  };
+  
+  // Convert categories from props to the format expected by the Card component
+  const catagories = categories ? categories.map(cat => ({
+    name: cat.name,
+    emoji: <FontAwesomeIcon className="catagory-icon" icon={getIconFromName(cat.icon)} />
+  })) : [
     {
       name: "Personal",
       emoji: <FontAwesomeIcon className="catagory-icon" icon={faUser} />,
@@ -111,6 +139,7 @@ function Recent({darkMode, speechLanguage}) {
     setName("");
     setLocation("");
     setTime("");
+    setCatagory("Personal")
   };
 
   const handleLocationChange = (id, newLocation) => {
@@ -183,7 +212,6 @@ function Recent({darkMode, speechLanguage}) {
     
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter((item) => {
-        // Use the searchtype state to determine which property to search in
         const propertyToSearch = searchtype.toLowerCase();
         if (propertyToSearch === "name" && item.name) {
           return item.name.toLowerCase().includes(searchTerm.toLowerCase());

@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faTrash } from "@fortawesome/free-solid-svg-icons";
 
+// Function to detect if text contains Arabic characters
+const containsArabic = (text) => {
+  const arabicPattern = /[\u0600-\u06FF]/;
+  return arabicPattern.test(text);
+};
+
 const Card = ({
   name,
   location,
@@ -22,13 +28,17 @@ const Card = ({
     const matched = catagories.find((c) => c.name === catagory);
     setEmoji(matched ? matched.emoji : "");
   }, [catagories, catagory]);
+  
+  // Check if name contains Arabic text
+  const isNameRTL = containsArabic(name);
+  const isLocationRTL = containsArabic(location);
 
   return (
     <>
       <div
         className={`item ${expanded ? "expanded" : "collapsed"} ${
           isDeleting ? "deleting" : ""
-        }`}
+        } ${isNameRTL ? "rtl" : "ltr"}`}
         onAnimationEnd={isDeleting ? () => onRemove() : undefined}
       >
         <div className="dropdown">
@@ -51,7 +61,7 @@ const Card = ({
         </div>
         <div className="item-info">
           {time ? (
-            <div className="time-informations-wrapper">
+            <div className={`time-informations-wrapper ${isLocationRTL ? "location-rtl" : "location-ltr"}`}>
               <input
                 className="location-input"
                 value={time}
@@ -60,13 +70,13 @@ const Card = ({
               <p>{location}</p>
             </div>
           ) : (
-            <>
+            <div className={isLocationRTL ? "location-rtl" : "location-ltr"}>
               <input
                 className="location-input"
                 value={location}
                 onChange={(e) => onLocationChange(e.target.value)}
               />
-            </>
+            </div>
           )}
           <button aria-label="Remove item" className="remove" onClick={() => setIsDeleting(true)}>
             <FontAwesomeIcon aria-hidden="true" icon={faTrash} />

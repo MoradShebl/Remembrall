@@ -216,6 +216,25 @@ button:disabled {
   align-items: center;
 }
 
+.item.rtl .item-info {
+  flex-direction: row-reverse;
+}
+
+/* RTL Support for Arabic */
+.item.rtl .item-info-header {
+  direction: rtl;
+}
+.location-rtl {
+  direction: rtl;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.location-ltr {
+  direction: ltr;
+  display: flex;
+}
+
 .item.collapsed {
   max-height: 40px;
   padding: 10px;
@@ -663,7 +682,7 @@ header{
   position: fixed;
   top: 0;
   right: 0;
-  width: 100%;
+  width: 90%;
   height: 100vh;
   background-color: var(--primary-color);
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
@@ -680,22 +699,18 @@ header{
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
-    opacity: 0;
   }
   to {
     transform: translateX(0);
-    opacity: 1;
   }
 }
 
 @keyframes slideOutRight {
   from {
     transform: translateX(0);
-    opacity: 1;
   }
   to {
     transform: translateX(100%);
-    opacity: 0;
   }
 }
 
@@ -737,7 +752,7 @@ header{
   border: 1px solid var(--accent-color);
   border-radius: 10px;
   background-color: var(--secondary-color);
-  padding-left: 10px;
+  padding: 1px;
   transition: border-color 0.3s var(--cubic-bezier), box-shadow 0.3s var(--cubic-bezier), transform 0.3s var(--cubic-bezier);
   cursor: pointer;
   animation: fadeIn 0.5s var(--cubic-bezier) forwards;
@@ -776,7 +791,6 @@ header{
   border-radius: 10px;
   background-color: var(--secondary-color);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s var(--cubic-bezier), box-shadow 0.3s var(--cubic-bezier);
   justify-content: center;
   margin-bottom: 10px;
 }
@@ -790,6 +804,22 @@ header{
   display: flex;
 }
 
+.add-cata{
+  border-radius: 10px;
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--accent-color);
+  padding: 5px;
+  border-radius: 10px;
+  background-color: var(--secondary-color);
+  cursor: pointer;
+  animation: fadeIn 0.5s var(--cubic-bezier) forwards;
+  animation-delay: 0.2s;
+}
+.add-cata-screen{
+  height: 250px;
+  overflow: hidden;
+}
 /* Core dark mode styles */
 [data-theme="dark"] {
   --primary-color: var(--primary-dark-color);
