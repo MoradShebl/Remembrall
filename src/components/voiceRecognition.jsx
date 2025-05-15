@@ -36,6 +36,9 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
     let itemLocation = "";
     let itemCategory = "Personal"; // Default category
 
+    // Log the received command for debugging
+    console.log("Processing voice command:", command);
+    
     // Define patterns for category commands
     const categoryPatterns = [
       // "Add keys to drawer in Work category"
@@ -67,6 +70,8 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
     for (const { pattern, type } of categoryPatterns) {
       const match = command.match(pattern);
       if (match) {
+        console.log(`Match found for pattern type: ${type}`, match);
+        
         if (type === 'addToCategoryIn') {
           itemName = match[1].trim();
           itemCategory = match[2].trim();
@@ -82,6 +87,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
         }
         matched = true;
         console.log(`Matched category pattern: ${type}`);
+        console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}"`);
         break;
       }
     }
@@ -95,6 +101,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
           itemLocation = match[2].trim();
           matched = true;
           console.log(`Matched basic pattern: ${type}`);
+          console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}" (default)`);
           break;
         }
       }
@@ -222,8 +229,8 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
                 <h4>Category Commands</h4>
                 <ul>
                   <li><strong>"Add keys to drawer in Work category"</strong></li>
-                  <li><strong>"Add laptop to Home category in office"</strong></li>
-                  <li><strong>"Add notebook in Personal category at desk"</strong></li>
+                  <li><strong>"Add laptop in office to Home category"</strong></li>
+                  <li><strong>"Add notebook at desk in Personal category"</strong></li>
                   <li><strong>"Put headphones in bag in Work category"</strong></li>
                 </ul>
               </div>
@@ -234,6 +241,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
                   <li><strong>Personal</strong> - For personal belongings</li>
                   <li><strong>Work</strong> - For work-related items</li>
                   <li><strong>Home</strong> - For household items</li>
+                  <li><strong>Custom</strong> - You can make it in settings</li>
                 </ul>
               </div>
               

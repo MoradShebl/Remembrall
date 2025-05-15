@@ -815,10 +815,14 @@ header{
   cursor: pointer;
   animation: fadeIn 0.5s var(--cubic-bezier) forwards;
   animation-delay: 0.2s;
+  margin-left: 10px;
 }
 .add-cata-screen{
   height: 250px;
   overflow: hidden;
+}
+.show-categories{
+  height: auto;
 }
 /* Core dark mode styles */
 [data-theme="dark"] {
@@ -877,6 +881,7 @@ header{
 
 [data-theme="dark"] .location-input,
 [data-theme="dark"] input,
+[data-theme="dark"] .add-cata,
 [data-theme="dark"] .speech-recognition-input {
   background-color: var(--input-dark-color);
   color: var(--text-dark-color);

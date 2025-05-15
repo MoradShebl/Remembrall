@@ -11,16 +11,17 @@ function App() {
   const [isClosingSettings, setIsClosingSettings] = useState(false);
   const [speechLanguage, setSpeechLanguage] = useState("en");
   const [addCataScreen, setAddCataScreen] = useState(false);
+  const [showCataScreen, setshowCataScreen] = useState(false);
   const [newCataName, setNewCataName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("faUser");
-  
+
   // Load categories from localStorage or use defaults
   const defaultCategories = [
     { name: "Personal", icon: "faUser", emoji: "👤" },
     { name: "Work", icon: "faBriefcase", emoji: "💼" },
-    { name: "Home", icon: "faHome", emoji: "🏠" }
+    { name: "Home", icon: "faHome", emoji: "🏠" },
   ];
-  
+
   // Available emojis for selection
   const emojiOptions = [
     { value: "faUser", label: "👤 Person" },
@@ -32,12 +33,12 @@ function App() {
     { value: "faCar", label: "🚗 Car" },
     { value: "faKey", label: "🔑 Key" },
     { value: "faWallet", label: "👛 Wallet" },
-    { value: "faGlasses", label: "👓 Glasses" }
+    { value: "faGlasses", label: "👓 Glasses" },
   ];
-  
+
   const [categories, setCategories] = useState(() => {
     try {
-      const savedCategories = localStorage.getItem('categories');
+      const savedCategories = localStorage.getItem("categories");
       return savedCategories ? JSON.parse(savedCategories) : defaultCategories;
     } catch (error) {
       console.error("Error loading categories from localStorage:", error);
@@ -46,22 +47,24 @@ function App() {
   });
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
-      setDarkMode(savedTheme === 'dark');
+      setDarkMode(savedTheme === "dark");
     } else {
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
       setDarkMode(prefersDark);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
-  
+
   useEffect(() => {
     try {
-      localStorage.setItem('categories', JSON.stringify(categories));
+      localStorage.setItem("categories", JSON.stringify(categories));
     } catch (error) {
       console.error("Error saving categories to localStorage:", error);
     }
@@ -74,45 +77,47 @@ function App() {
       setIsTransitioning(false);
     }, 500);
   };
-  
+
   const handleCloseSettings = () => {
     // Start the closing animation
     setIsClosingSettings(true);
-    
+
     // Wait for animation to complete before hiding the settings panel
     setTimeout(() => {
       setShowSettings(false);
       setIsClosingSettings(false);
     }, 300); // Match this with the animation duration in CSS
   };
-  
+
   const handleAddCategory = () => {
     if (!newCataName.trim()) {
       alert("Please enter a category name");
       return;
     }
-    
+
     // Check if category already exists
-    if (categories.some(cat => cat.name === newCataName)) {
+    if (categories.some((cat) => cat.name === newCataName)) {
       alert("This category already exists");
       return;
     }
-    
+
     // Find the selected emoji
-    const selectedOption = emojiOptions.find(option => option.value === selectedIcon);
-    
+    const selectedOption = emojiOptions.find(
+      (option) => option.value === selectedIcon
+    );
+
     // Add new category
     const newCategory = {
       name: newCataName,
       icon: selectedIcon,
-      emoji: selectedOption ? selectedOption.label.split(' ')[0] : "👤"
+      emoji: selectedOption ? selectedOption.label.split(" ")[0] : "👤",
     };
-    
+
     setCategories([...categories, newCategory]);
     setNewCataName("");
     setAddCataScreen(false);
   };
-  
+
   const closeAddCategoryScreen = () => {
     setAddCataScreen(false);
     setNewCataName("");
@@ -121,27 +126,31 @@ function App() {
   return (
     <>
       <main>
-        <div 
-          className={`container ${isTransitioning ? 'theme-changing' : ''}`} 
+        <div
+          className={`container ${isTransitioning ? "theme-changing" : ""}`}
           data-theme={darkMode ? "dark" : "light"}
         >
           <header>
             <h1>Remembrall</h1>
             <div className="settings-container">
-              <button 
+              <button
                 className="settings-btn"
                 onClick={() => setShowSettings(true)}
                 aria-label="Open settings"
-                >
+              >
                 <FontAwesomeIcon icon={faGear} />
               </button>
             </div>
           </header>
           {showSettings && (
-            <div className={`settings ${isClosingSettings ? 'settings-closing' : ''}`}>
+            <div
+              className={`settings ${
+                isClosingSettings ? "settings-closing" : ""
+              }`}
+            >
               <div className="settings-header">
                 <h2>Settings</h2>
-                <button 
+                <button
                   className="close"
                   onClick={handleCloseSettings}
                   aria-label="Close settings"
@@ -153,12 +162,20 @@ function App() {
                 <div className="settings-item">
                   <h3>Theme</h3>
                   <div className="settings-item-content">
-                    <button 
+                    <button
                       className="toggle-btn"
                       onClick={toggleTheme}
-                      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                      aria-label={
+                        darkMode
+                          ? "Switch to light mode"
+                          : "Switch to dark mode"
+                      }
                     >
-                      {darkMode ? <Sun className="mode-icon" size={24} /> : <Moon className="mode-icon" size={24} />}
+                      {darkMode ? (
+                        <Sun className="mode-icon" size={24} />
+                      ) : (
+                        <Moon className="mode-icon" size={24} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -167,7 +184,13 @@ function App() {
                 <div className="settings-item">
                   <h3>Speech Language</h3>
                   <div className="settings-item-content">
-                    <select className="language-select" value={speechLanguage} onChange={(e) => {setSpeechLanguage(e.target.value)}}>
+                    <select
+                      className="language-select"
+                      value={speechLanguage}
+                      onChange={(e) => {
+                        setSpeechLanguage(e.target.value);
+                      }}
+                    >
                       <option value="en">English</option>
                       <option value="ar">Arabic</option>
                     </select>
@@ -178,11 +201,17 @@ function App() {
                 <div className="settings-item">
                   <h3>Add Cata</h3>
                   <div className="settings-item-content">
-                    <button 
+                    <button
                       className="add-cata"
                       onClick={() => setAddCataScreen(true)}
                     >
                       Add Cata
+                    </button>
+                    <button
+                      className="add-cata"
+                      onClick={() => setshowCataScreen(true)}
+                    >
+                      Categories
                     </button>
                   </div>
                 </div>
@@ -209,7 +238,7 @@ function App() {
                   value={selectedIcon}
                   onChange={(e) => setSelectedIcon(e.target.value)}
                 >
-                  {emojiOptions.map(option => (
+                  {emojiOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -226,7 +255,30 @@ function App() {
               </div>
             </div>
           )}
-          <Recent darkMode={darkMode} speechLanguage={speechLanguage} categories={categories}/>
+          {showCataScreen && (
+            <div className="bg">
+              <div className="add-item-screen show-categories">
+                <div className="header">
+                  <h2>Your Categories:</h2>
+                  <button className="close" onClick={() => setshowCataScreen(false)}>
+                    <FontAwesomeIcon icon={faX} />
+                  </button>
+                </div>
+                {categories.map((cata) => (
+                  <ul>
+                    <li key={cata.name}>
+                      {cata.name}
+                    </li>
+                  </ul>
+                ))}
+              </div>
+            </div>
+          )}
+          <Recent
+            darkMode={darkMode}
+            speechLanguage={speechLanguage}
+            categories={categories}
+          />
         </div>
       </main>
     </>

@@ -276,9 +276,11 @@ function Recent({darkMode, speechLanguage, categories}) {
         </div>
         <select onChange={(e) => handleCatagoryFilterChange(e.target.value)} className="catagories-filter-select catagory-select">
           <option value="All">All Categories</option>
-          <option value="Personal">Personal</option>
-          <option value="Work">Work</option>
-          <option value="Home">Home</option>
+          {
+            catagories.map((cata) => (
+              <option key={cata.name} value={cata.name}>{cata.name}</option>
+            ))
+          }
         </select>
         {getFilteredItems().length === 0 ? (
           <div className="empty">

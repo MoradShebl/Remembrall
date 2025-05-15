@@ -90,7 +90,7 @@ const Card = ({
         >
           {catagories.map((cata) => (
             <>
-              <option>{cata.name}</option>
+              <option key={cata.name}>{cata.name}</option>
             </>
           ))}
         </select>
