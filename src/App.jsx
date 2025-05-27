@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import Recent from "./components/Recent.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faX } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faX, faTrash } from "@fortawesome/free-solid-svg-icons";
+import nameLogo from "./assets/logo.png";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -123,6 +124,10 @@ function App() {
     setNewCataName("");
   };
 
+  const handleRemoveCata = (name) => {
+    setCategories(categories.filter((cata) => cata.name !== name));
+  };
+
   return (
     <>
       <main>
@@ -131,7 +136,7 @@ function App() {
           data-theme={darkMode ? "dark" : "light"}
         >
           <header>
-            <h1>Remembrall</h1>
+            <h1><img src={nameLogo} alt="Remembrall"/></h1>
             <div className="settings-container">
               <button
                 className="settings-btn"
@@ -149,7 +154,7 @@ function App() {
               }`}
             >
               <div className="settings-header">
-                <h2>Settings</h2>
+                <h3>Settings</h3>
                 <button
                   className="close"
                   onClick={handleCloseSettings}
@@ -201,20 +206,63 @@ function App() {
                 <div className="settings-item">
                   <h3>Add Cata</h3>
                   <div className="settings-item-content">
-                    <button
-                      className="add-cata"
-                      onClick={() => setAddCataScreen(true)}
-                    >
-                      Add Cata
-                    </button>
-                    <button
-                      className="add-cata"
-                      onClick={() => setshowCataScreen(true)}
-                    >
-                      Categories
-                    </button>
+                    <div className="settings-item">
+                      <button
+                        className="catagory-screen-button"
+                        onClick={() => setshowCataScreen(true)}
+                      >
+                        Categories
+                      </button>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+          {showCataScreen && (
+            <div className="bg">
+              <div className="add-item-screen show-categories">
+                <div className="settings-header header">
+                  <h3>Your Categories</h3>
+                  <button
+                    className="close"
+                    onClick={() => setshowCataScreen(false)}
+                  >
+                    <FontAwesomeIcon icon={faX} />
+                  </button>
+                </div>
+                {!categories ? (
+                  <div className="empty">
+                    <p>No Folks here!</p>
+                  </div>
+                ) : (
+                  categories.map((cata) => (
+                    <ul className="cata-wrapper">
+                      <li key={cata.name} className="cata-edit">
+                        {cata.name}
+                        {cata.name === "Personal" ||
+                        cata.name === "Work" ||
+                        cata.name === "Home" ? (
+                          <></>
+                        ) : (
+                          <button aria-label="Remove item" className="remove">
+                            <FontAwesomeIcon
+                              aria-hidden="true"
+                              icon={faTrash}
+                              onClick={() => handleRemoveCata(cata.name)}
+                            />
+                          </button>
+                        )}
+                      </li>
+                    </ul>
+                  ))
+                )}
+                <button
+                  className="add-button add-cata"
+                  onClick={() => setAddCataScreen(true)}
+                >
+                  Add Cata
+                </button>
               </div>
             </div>
           )}
@@ -252,25 +300,6 @@ function App() {
                     Add Category
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
-          {showCataScreen && (
-            <div className="bg">
-              <div className="add-item-screen show-categories">
-                <div className="header">
-                  <h2>Your Categories:</h2>
-                  <button className="close" onClick={() => setshowCataScreen(false)}>
-                    <FontAwesomeIcon icon={faX} />
-                  </button>
-                </div>
-                {categories.map((cata) => (
-                  <ul>
-                    <li key={cata.name}>
-                      {cata.name}
-                    </li>
-                  </ul>
-                ))}
               </div>
             </div>
           )}
