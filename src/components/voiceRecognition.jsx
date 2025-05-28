@@ -8,7 +8,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
+const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories }) => {
   const [status, setStatus] = useState("");
   const [showHelp, setShowHelp] = useState(false);
   const { text, setText, isListening, startListening, stopListening } =
@@ -38,9 +38,23 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
     let itemName = "";
     let itemLocation = "";
     let itemCategory = "Personal"; // Default category
+    let itemTime = "";
+    let isTimeCommand = false;
 
     // Log the received command for debugging
     console.log("Processing voice command:", command);
+    
+    // Define patterns for time commands
+    const timePatterns = [
+      // "Remind me about meeting at 3:00 PM"
+      { pattern: /remind\s+(?:me\s+)?(?:about\s+)?(.+?)\s+at\s+(.+?)(?:\s+(?:in|at)\s+(.+))?/i, type: 'remindAt' },
+      // "Set a reminder for dentist appointment at 2:30 PM"
+      { pattern: /set\s+a\s+reminder\s+for\s+(.+?)\s+at\s+(.+?)(?:\s+(?:in|at)\s+(.+))?/i, type: 'reminderAt' },
+      // "Add time for meeting at 4:00 PM"
+      { pattern: /add\s+time\s+for\s+(.+?)\s+at\s+(.+?)(?:\s+(?:in|at)\s+(.+))?/i, type: 'timeFor' },
+      // "Meeting at 3:00 PM"
+      { pattern: /(.+?)\s+at\s+([0-9]{1,2}:[0-9]{2}(?:\s*[ap]m)?)(?:\s+(?:in|at)\s+(.+))?/i, type: 'eventAt' },
+    ];
     
     // Define patterns for category commands
     const categoryPatterns = [
@@ -67,31 +81,51 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
       { pattern: /i\s+put\s+(.+?)\s+on\s+(.+)/i, type: 'putOn' }
     ];
     
-    // First try to match category patterns
+    // First try to match time patterns
     let matched = false;
     
-    for (const { pattern, type } of categoryPatterns) {
+    for (const { pattern, type } of timePatterns) {
       const match = command.match(pattern);
       if (match) {
-        console.log(`Match found for pattern type: ${type}`, match);
+        console.log(`Match found for time pattern type: ${type}`, match);
         
-        if (type === 'addToCategoryIn') {
-          itemName = match[1].trim();
-          itemCategory = match[2].trim();
-          itemLocation = match[3].trim();
-        } else if (type === 'addInCategoryAt') {
-          itemName = match[1].trim();
-          itemCategory = match[2].trim();
-          itemLocation = match[3].trim();
-        } else {
-          itemName = match[1].trim();
-          itemLocation = match[2].trim();
-          itemCategory = match[3].trim();
-        }
+        itemName = match[1].trim();
+        itemTime = match[2].trim();
+        itemLocation = match[3] ? match[3].trim() : "Online";
+        
         matched = true;
-        console.log(`Matched category pattern: ${type}`);
-        console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}"`);
+        isTimeCommand = true;
+        console.log(`Matched time pattern: ${type}`);
+        console.log(`Extracted: name="${itemName}", time="${itemTime}", location="${itemLocation}"`);
         break;
+      }
+    }
+    
+    // If no time pattern matched, try category patterns
+    if (!matched) {
+      for (const { pattern, type } of categoryPatterns) {
+        const match = command.match(pattern);
+        if (match) {
+          console.log(`Match found for pattern type: ${type}`, match);
+          
+          if (type === 'addToCategoryIn') {
+            itemName = match[1].trim();
+            itemCategory = match[2].trim();
+            itemLocation = match[3].trim();
+          } else if (type === 'addInCategoryAt') {
+            itemName = match[1].trim();
+            itemCategory = match[2].trim();
+            itemLocation = match[3].trim();
+          } else {
+            itemName = match[1].trim();
+            itemLocation = match[2].trim();
+            itemCategory = match[3].trim();
+          }
+          matched = true;
+          console.log(`Matched category pattern: ${type}`);
+          console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}"`);
+          break;
+        }
       }
     }
     
@@ -104,7 +138,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
           itemLocation = match[2].trim();
           matched = true;
           console.log(`Matched basic pattern: ${type}`);
-          console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}" (default)`);
+          console.log(`Extracted: name="${itemName}", location="${itemLocation}"`);
           break;
         }
       }
@@ -137,11 +171,47 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
 
     console.log(`Parsed: Item "${itemName}" at location "${itemLocation}" in category "${itemCategory}"`);
     
-    // Reset state and add the item with category
+    // If we matched a pattern, add the item or time
+    if (matched) {
+      // Validate category if provided
+      if (itemCategory) {
+        const validCategory = categories.find(
+          (cat) => cat.name.toLowerCase() === itemCategory.toLowerCase()
+        );
+        
+        if (!validCategory) {
+          console.log(`Category '${itemCategory}' not found, using 'Personal'`);
+          itemCategory = "Personal";
+        } else {
+          itemCategory = validCategory.name; // Use the proper casing from the categories array
+        }
+      }
+      
+      if (isTimeCommand && onAddTime) {
+        // Format time if needed
+        if (itemTime.match(/^\d{1,2}(?::\d{2})?$/)) {
+          // If time is just numbers like "3" or "3:30", assume it's a 24-hour format
+          // If it's just a number like "3", add ":00"
+          if (!itemTime.includes(':')) {
+            itemTime = `${itemTime}:00`;
+          }
+        }
+        
+        // Call the onAddTime function with the extracted information
+        onAddTime(itemName, itemLocation, itemTime);
+        console.log("Added time:", { itemName, itemLocation, itemTime });
+      } else {
+        // Call the onAddItem function with the extracted information
+        onAddItem(itemName, itemLocation, itemCategory);
+        console.log("Added item:", { itemName, itemLocation, itemCategory });
+      }
+    } else {
+      console.log("No pattern matched for command:", command);
+      // Could show a message to the user that the command wasn't understood
+    }
     setStatus("not listening");
     setText("");
-    onAddItem(itemName, itemLocation, itemCategory);
-  }, [text, setText, onAddItem, categories]);
+  }, [text, setText, onAddItem, categories, onAddTime]);
 
   const cancelListening = useCallback(() => {
     setStatus("not listening");
@@ -218,6 +288,16 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
                   <li><strong>"Put wallet in bedroom"</strong> - Alternative way to add</li>
                   <li><strong>"My glasses are in the car"</strong> - Descriptive addition</li>
                   <li><strong>"I left my phone at work"</strong> - Location-based addition</li>
+                </ul>
+              </div>
+              
+              <div className="help-section">
+                <h4>Time Commands</h4>
+                <ul>
+                  <li><strong>"Remind me about meeting at 3:00 PM"</strong> - Set a time reminder</li>
+                  <li><strong>"Set a reminder for dentist at 2:30 PM"</strong> - Create a timed event</li>
+                  <li><strong>"Add time for meeting at 4:00 PM"</strong> - Add a time-based item</li>
+                  <li><strong>"Meeting at 3:00 PM in office"</strong> - Quick time addition with location</li>
                 </ul>
               </div>
               

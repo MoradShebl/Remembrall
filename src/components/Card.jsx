@@ -40,6 +40,7 @@ const Card = ({
           isDeleting ? "deleting" : ""
         } ${isNameRTL ? "rtl" : "ltr"}`}
         onAnimationEnd={isDeleting ? () => onRemove() : undefined}
+        style={{ touchAction: "manipulation" }}
       >
         <div className="dropdown">
           <button

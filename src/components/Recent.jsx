@@ -361,6 +361,7 @@ function Recent({ darkMode, speechLanguage, categories }) {
             <SpeechRecognition
               aria-label="Start speech recognition"
               onAddItem={handleAddItem}
+              onAddTime={handleAddTime}
               speechLanguage={speechLanguage}
               categories={
                 categories ||
