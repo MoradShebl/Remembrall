@@ -84,6 +84,9 @@ function Recent({ darkMode, speechLanguage, categories }) {
   const [addTime, setAddTime] = useState(false);
   const [catagory, setCatagory] = useState("Personal");
   const [searchtype, setSearchType] = useState("name");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const [details, setDetails] = useState("");
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
@@ -91,7 +94,7 @@ function Recent({ darkMode, speechLanguage, categories }) {
 
   const [currentFilter, setCurrentFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeSection, setActiveSection] = useState("items"); // 'items' or 'times'
+  const [activeSection, setActiveSection] = useState("items"); // 'items', 'times', or 'todos'
 
   const handleRemove = (id) => {
     setItems(items.filter((item) => item.id !== id));
@@ -116,18 +119,28 @@ function Recent({ darkMode, speechLanguage, categories }) {
           (cat) => cat.name.toLowerCase() === category.toLowerCase()
         )?.name;
 
-    setItems([
-      ...items,
-      {
-        id: items.length + 1,
-        name: name,
-        location: location,
-        catagory: validCategory || catagory, // Use validated category or default
-      },
-    ]);
+    const newItem = {
+      id: items.length + 1,
+      name: name,
+      location: location,
+      catagory: validCategory || catagory, // Use validated category or default
+      isTodo: activeSection === "todos",
+      isCompleted: false,
+    };
+    
+    // Add to-do specific properties if it's a to-do
+    if (activeSection === "todos") {
+      newItem.dueDate = dueDate;
+      newItem.priority = priority;
+      newItem.details = details;
+    }
+
+    setItems([...items, newItem]);
     setAddItemScreen(false);
     setName("");
     setLocation("");
+    setDueDate("");
+    setDetails("");
   };
 
   const handleAddTime = (name, location, time) => {
@@ -139,20 +152,31 @@ function Recent({ darkMode, speechLanguage, categories }) {
       alert("Please enter a time");
       return;
     }
-    setItems([
-      ...items,
-      {
-        id: items.length + 1,
-        name: name,
-        location: location ? location : "Online",
-        catagory: catagory,
-        time: time,
-      },
-    ]);
+    
+    const newItem = {
+      id: items.length + 1,
+      name: name,
+      location: location ? location : "Online",
+      catagory: catagory,
+      time: time,
+      isTodo: activeSection === "todos",
+      isCompleted: false,
+    };
+    
+    // Add to-do specific properties if it's a to-do
+    if (activeSection === "todos") {
+      newItem.dueDate = dueDate;
+      newItem.priority = priority;
+      newItem.details = details;
+    }
+    
+    setItems([...items, newItem]);
     setAddItemScreen(false);
     setName("");
     setLocation("");
     setTime("");
+    setDueDate("");
+    setDetails("");
   };
 
   const handleLocationChange = (id, newLocation) => {
@@ -171,8 +195,12 @@ function Recent({ darkMode, speechLanguage, categories }) {
 
   const removeAddingList = () => {
     setAddItemScreen(false);
+    setName("");
+    setLocation("");
+    setDueDate("");
+    setPriority("medium");
+    setDetails("");
     setAddTime(false);
-    console.log(addTime);
   };
 
   const handleAddTimeScreen = () => {
@@ -213,40 +241,53 @@ function Recent({ darkMode, speechLanguage, categories }) {
       )
     );
   };
+  
+  const handleMarkComplete = (id) => {
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+      )
+    );
+  };
 
   const handleCatagoryFilterChange = (filter) => {
     setCurrentFilter(filter);
   };
 
   const getFilteredItems = () => {
-    // First filter by active section (items or times)
-    let filtered = items.filter((item) => {
-      if (activeSection === "items") {
-        return !item.time; // Show only items without time property
-      } else {
-        return item.time; // Show only items with time property
-      }
-    });
+    let filteredItems = [...items];
 
-    // Then filter by category if not 'All'
+    // First filter by category if not "All"
     if (currentFilter !== "All") {
-      filtered = filtered.filter((item) => item.catagory === currentFilter);
+      filteredItems = filteredItems.filter(
+        (item) => item.catagory === currentFilter
+      );
     }
 
-    // Finally filter by search term if present
-    if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((item) => {
-        const propertyToSearch = searchtype.toLowerCase();
-        if (propertyToSearch === "name" && item.name) {
+    // Then filter by search term if present
+    if (searchTerm) {
+      filteredItems = filteredItems.filter((item) => {
+        if (searchtype === "name") {
           return item.name.toLowerCase().includes(searchTerm.toLowerCase());
-        } else if (propertyToSearch === "location" && item.location) {
-          return item.location.toLowerCase().includes(searchTerm.toLowerCase());
+        } else if (searchtype === "location") {
+          return item.location
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
         }
-        return false;
+        return true; // Default case
       });
     }
 
-    return filtered;
+    // Finally filter by section (items vs times vs todos)
+    if (activeSection === "items") {
+      return filteredItems.filter((item) => !item.time && !item.isTodo);
+    } else if (activeSection === "times") {
+      return filteredItems.filter((item) => item.time && !item.isTodo);
+    } else if (activeSection === "todos") {
+      return filteredItems.filter((item) => item.isTodo);
+    }
+
+    return filteredItems;
   };
 
   const handleSearchChange = (e) => {
@@ -314,46 +355,54 @@ function Recent({ darkMode, speechLanguage, categories }) {
               </option>
             ))}
           </select>
-          {getFilteredItems().length === 0 ? (
-            <div className="empty">
-              <p>No Folks here!</p>
-            </div>
-          ) : (
-            getFilteredItems().map((item) => (
-              <Card
-                key={item.id}
-                name={item.name}
-                location={item.location}
-                time={item.time}
-                catagory={item.catagory}
-                catagories={catagories}
-                onRemove={() => handleRemove(item.id)}
-                onLocationChange={(newLocation) =>
-                  handleLocationChange(item.id, newLocation)
-                }
-                onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
-                onCatagoryChange={(newCatagory) =>
-                  handleCatagoryChange(item.id, newCatagory)
-                }
-              />
-            ))
-          )}
+          <div className="items-list">
+            {getFilteredItems().length === 0 ? (
+              <div className="empty">
+                <p>No {activeSection} here!</p>
+              </div>
+            ) : (
+              getFilteredItems().map((item) => (
+                <Card
+                  key={item.id}
+                  name={item.name}
+                  location={item.location}
+                  time={item.time}
+                  catagory={item.catagory}
+                  catagories={catagories}
+                  onRemove={() => handleRemove(item.id)}
+                  onLocationChange={(newLocation) =>
+                    handleLocationChange(item.id, newLocation)
+                  }
+                  onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
+                  onCatagoryChange={(newCatagory) =>
+                    handleCatagoryChange(item.id, newCatagory)
+                  }
+                  onMarkComplete={() => handleMarkComplete(item.id)}
+                  isCompleted={item.isCompleted}
+                  isTodo={item.isTodo}
+                  dueDate={item.dueDate}
+                  priority={item.priority}
+                  details={item.details}
+                />
+              ))
+            )}
+          </div>
         </div>
         <div className="buttom">
           <div className="add">
-            {activeSection === "items" ? (
-              <button
-                className="add-button"
-                onClick={() => setAddItemScreen(true)}
-              >
-                <span>Add item</span>
-              </button>
-            ) : (
+            {activeSection === "times" ? (
               <button
                 className="add-button"
                 onClick={() => handleAddTimeScreen()}
               >
                 <p>Add time</p>
+              </button>
+            ) : (
+              <button
+                className="add-button"
+                onClick={() => setAddItemScreen(true)}
+              >
+                <span>Add {activeSection === "todos" ? "to-do" : "item"}</span>
               </button>
             )}
           </div>
@@ -394,6 +443,14 @@ function Recent({ darkMode, speechLanguage, categories }) {
             >
               Times
             </div>
+            <div
+              className={`section-btn ${
+                activeSection === "todos" ? "active" : ""
+              }`}
+              onClick={() => setActiveSection("todos")}
+            >
+              To-Dos
+            </div>
           </div>
         </div>
       </div>
@@ -401,14 +458,14 @@ function Recent({ darkMode, speechLanguage, categories }) {
         <div className="bg">
           <div className="add-item-screen">
             <div className="header">
-              <h2>Add new {addTime ? "time" : "item"}</h2>
+              <h2>Add new {addTime ? "time" : activeSection === "todos" ? "to-do" : "item"}</h2>
               <button className="close" onClick={() => removeAddingList()}>
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
             <input
               type="text"
-              placeholder={addTime ? "Time name" : "Item name"}
+              placeholder={addTime ? "Time name" : activeSection === "todos" ? "To-do title" : "Item name"}
               onChange={(e) => setName(e.target.value)}
             />
             {addTime && (
@@ -418,12 +475,51 @@ function Recent({ darkMode, speechLanguage, categories }) {
                 onChange={(e) => setTime(e.target.value)}
               />
             )}
+            {activeSection === "todos" && (
+              <div className="todo-form-fields">
+                <div className="todo-form-field">
+                  <label htmlFor="dueDate">Due Date</label>
+                  <input
+                    type="date"
+                    id="dueDate"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                  />
+                </div>
+                <div className="todo-form-field">
+                  <label htmlFor="priority">Priority</label>
+                  <select 
+                    id="priority" 
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="priority-select"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div className="todo-form-field">
+                  <label htmlFor="details">Details</label>
+                  <textarea
+                    id="details"
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                    placeholder="Enter additional details for this to-do"
+                    rows="3"
+                    className="todo-details-input"
+                  />
+                </div>
+              </div>
+            )}
             <div className="location-wrapper">
               <input
                 type="text"
                 placeholder={
                   addTime
                     ? "Time location (Online by default)"
+                    : activeSection === "todos"
+                    ? "To-do location or context"
                     : "Item location"
                 }
                 onChange={(e) => setLocation(e.target.value)}
@@ -457,13 +553,17 @@ function Recent({ darkMode, speechLanguage, categories }) {
             <div className="add-item-buttons">
               <button
                 className="add-button add-item-screen-button"
-                onClick={() =>
-                  addTime
-                    ? handleAddTime(name, location, time)
-                    : handleAddItem(name, location)
-                }
+                onClick={() => {
+                  if (activeSection === "todos" && !addTime) {
+                    handleAddItem(name, location);
+                  } else if (addTime) {
+                    handleAddTime(name, location, time);
+                  } else {
+                    handleAddItem(name, location);
+                  }
+                }}
               >
-                Add {addTime ? "time" : "item"}
+                Add {activeSection === "todos" && !addTime ? "to-do" : addTime ? "time" : "item"}
               </button>
             </div>
           </div>
