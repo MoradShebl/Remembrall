@@ -146,18 +146,19 @@ button:disabled {
 }
 
 .item-container {
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px 10px 0px 0px;
-  padding: 10px;
+  padding: 15px;
   padding-bottom: 0px;
   height: auto;
-  min-height: calc(100vh - 40px);
+  min-height: calc(100vh - 80px);
   overflow: visible;
+  margin: 0 auto;
 }
 
 .item-container h2 {

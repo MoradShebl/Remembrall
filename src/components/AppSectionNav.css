@@ -1,0 +1,42 @@
+/* App Section Navigation Styles */
+.app-section-nav {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0 10px;
+  height: 45px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.app-section-nav .section-btn {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  border: none;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s var(--cubic-bezier);
+  flex: 1;
+}
+
+.app-section-nav .section-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.app-section-nav .section-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .app-section-nav .section-btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}

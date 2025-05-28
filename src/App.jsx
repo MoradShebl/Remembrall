@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import Recent from "./components/Recent.jsx";
+import Habits from "./components/Habits.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faX, faTrash } from "@fortawesome/free-solid-svg-icons";
 import nameLogo from "./assets/logo.png";
+import "./components/Habits.css";
+import "./components/AppSectionNav.css";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -15,6 +18,11 @@ function App() {
   const [showCataScreen, setshowCataScreen] = useState(false);
   const [newCataName, setNewCataName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("faUser");
+  const [activeSection, setActiveSection] = useState(() => {
+    // Load active section from localStorage or default to 'items'
+    const savedSection = localStorage.getItem("activeSection");
+    return savedSection || "items";
+  });
 
   // Load categories from localStorage or use defaults
   const defaultCategories = [
@@ -61,7 +69,12 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
+    document.body.classList.toggle("dark-mode", darkMode);
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("activeSection", activeSection);
+  }, [activeSection]);
 
   useEffect(() => {
     try {
@@ -303,11 +316,34 @@ function App() {
               </div>
             </div>
           )}
-          <Recent
-            darkMode={darkMode}
-            speechLanguage={speechLanguage}
-            categories={categories}
-          />
+          {/* App Section Navigation */}
+          <div className="app-section-nav">
+            <button 
+              className={`section-btn ${activeSection === "items" ? "active" : ""}`}
+              onClick={() => setActiveSection("items")}
+            >
+               Items & Todos
+            </button>
+            <button 
+              className={`section-btn ${activeSection === "habits" ? "active" : ""}`}
+              onClick={() => setActiveSection("habits")}
+            >
+               Habit Tracker
+            </button>
+          </div>
+          
+          {/* Keep both components mounted but toggle visibility */}
+          <div style={{ display: activeSection === "items" ? "block" : "none" }}>
+            <Recent
+              darkMode={darkMode}
+              speechLanguage={speechLanguage}
+              categories={categories}
+            />
+          </div>
+          
+          <div style={{ display: activeSection === "habits" ? "block" : "none", width: "100%"}}>
+            <Habits darkMode={darkMode} />
+          </div>
         </div>
       </main>
     </>
