@@ -442,8 +442,12 @@ button:disabled {
 }
 
 .item.collapsed {
-  max-height: 115px;
+  max-height: 40px;
   padding: 10px;
+}
+
+.item.todo-item {
+  max-height: 115px;
 }
 
 .item.expanded {

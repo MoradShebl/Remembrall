@@ -100,14 +100,21 @@ function Recent({ darkMode, speechLanguage, categories }) {
     setItems(items.filter((item) => item.id !== id));
   };
 
-  const handleAddItem = (name, location, category = catagory) => {
+  const handleAddItem = (name, location, category = catagory, todoData = null) => {
     if (!name) {
       alert("Please enter a name");
       return;
     }
-    if (!location) {
+    
+    // Only require location for non-todo items
+    if (!location && !todoData && activeSection !== "todos") {
       alert("Please enter a location");
       return;
+    }
+    
+    // Set a default location for todos if none provided
+    if (!location && (todoData || activeSection === "todos")) {
+      location = "To-do";
     }
 
     // Validate that the category exists in our categories list
@@ -124,12 +131,18 @@ function Recent({ darkMode, speechLanguage, categories }) {
       name: name,
       location: location,
       catagory: validCategory || catagory, // Use validated category or default
-      isTodo: activeSection === "todos",
+      isTodo: todoData ? true : activeSection === "todos",
       isCompleted: false,
     };
     
     // Add to-do specific properties if it's a to-do
-    if (activeSection === "todos") {
+    if (todoData) {
+      // If todoData is provided from voice command
+      newItem.dueDate = todoData.dueDate || "";
+      newItem.priority = todoData.priority || "medium";
+      newItem.details = todoData.details || "";
+    } else if (activeSection === "todos") {
+      // If adding from the form
       newItem.dueDate = dueDate;
       newItem.priority = priority;
       newItem.details = details;
@@ -141,6 +154,11 @@ function Recent({ darkMode, speechLanguage, categories }) {
     setLocation("");
     setDueDate("");
     setDetails("");
+    
+    // If it's a to-do from voice command, switch to to-do section
+    if (todoData && activeSection !== "todos") {
+      setActiveSection("todos");
+    }
   };
 
   const handleAddTime = (name, location, time) => {
@@ -412,6 +430,7 @@ function Recent({ darkMode, speechLanguage, categories }) {
               onAddItem={handleAddItem}
               onAddTime={handleAddTime}
               speechLanguage={speechLanguage}
+              activeSection={activeSection}
               categories={
                 categories ||
                 catagories.map((cat) => ({

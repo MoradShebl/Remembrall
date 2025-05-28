@@ -8,7 +8,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories }) => {
+const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories, activeSection }) => {
   const [status, setStatus] = useState("");
   const [showHelp, setShowHelp] = useState(false);
   const { text, setText, isListening, startListening, stopListening } =
@@ -40,9 +40,31 @@ const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories })
     let itemCategory = "Personal"; // Default category
     let itemTime = "";
     let isTimeCommand = false;
+    let isTodoCommand = false;
+    let todoPriority = "medium";
+    let todoDueDate = "";
+    let todoDetails = "";
 
     // Log the received command for debugging
-    console.log("Processing voice command:", command);
+    console.log("Processing voice command:", command, "Active section:", activeSection);
+    
+    // Define patterns for to-do commands
+    const todoPatterns = [
+      // "Add to-do buy groceries with high priority due tomorrow"
+      { pattern: /add\s+(?:a\s+)?to-?do\s+(.+?)(?:\s+with\s+(high|medium|low)\s+priority)?(?:\s+due\s+(.+?))?(?:\s+details\s+(.+))?$/i, type: 'addTodo' },
+      // "Create to-do finish report due Friday with medium priority"
+      { pattern: /create\s+(?:a\s+)?to-?do\s+(.+?)(?:\s+due\s+(.+?))?(?:\s+with\s+(high|medium|low)\s+priority)?(?:\s+details\s+(.+))?$/i, type: 'createTodo' },
+      // "To-do call mom tomorrow with high priority"
+      { pattern: /to-?do\s+(.+?)(?:\s+(?:due\s+|by\s+|on\s+)(.+?))?(?:\s+with\s+(high|medium|low)\s+priority)?(?:\s+details\s+(.+))?$/i, type: 'simpleTodo' },
+      // "Remind me to call mom with high priority"
+      { pattern: /remind\s+me\s+to\s+(.+?)(?:\s+(?:due\s+|by\s+|on\s+)(.+?))?(?:\s+with\s+(high|medium|low)\s+priority)?(?:\s+details\s+(.+))?$/i, type: 'remindTodo' },
+      // Simple todo command
+      { pattern: /make\s+(?:a\s+)?to-?do\s+(.+)/i, type: 'simpleTodo2' },
+      // Even simpler todo command
+      { pattern: /add\s+task\s+(.+)/i, type: 'simpleTask' },
+      // Exact pattern for "add to do buy milk"
+      { pattern: /^add\s+to\s+do\s+(.+)$/i, type: 'exactTodo' },
+    ];
     
     // Define patterns for time commands
     const timePatterns = [
@@ -81,65 +103,225 @@ const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories })
       { pattern: /i\s+put\s+(.+?)\s+on\s+(.+)/i, type: 'putOn' }
     ];
     
-    // First try to match time patterns
+    // Helper function to parse dates from text
+    const parseDueDate = (dateText) => {
+      if (!dateText) return "";
+      
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Format a date as YYYY-MM-DD for input[type="date"]
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
+      const lowerDateText = dateText.toLowerCase();
+      
+      if (lowerDateText === "today") {
+        return formatDate(today);
+      } else if (lowerDateText === "tomorrow") {
+        return formatDate(tomorrow);
+      } else if (lowerDateText.includes("next")) {
+        // Handle "next Monday", "next week", etc.
+        const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+        const dayIndex = weekdays.findIndex(day => lowerDateText.includes(day));
+        
+        if (dayIndex !== -1) {
+          const targetDate = new Date(today);
+          const currentDay = today.getDay();
+          const daysToAdd = (dayIndex + 7 - currentDay) % 7 || 7; // If today, go to next week
+          targetDate.setDate(today.getDate() + daysToAdd);
+          return formatDate(targetDate);
+        } else if (lowerDateText.includes("week")) {
+          const nextWeek = new Date(today);
+          nextWeek.setDate(today.getDate() + 7);
+          return formatDate(nextWeek);
+        }
+      } else {
+        // Try to handle day names like "Monday", "Tuesday", etc.
+        const weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+        const dayIndex = weekdays.findIndex(day => lowerDateText.includes(day));
+        
+        if (dayIndex !== -1) {
+          const targetDate = new Date(today);
+          const currentDay = today.getDay();
+          let daysToAdd = (dayIndex - currentDay) % 7;
+          if (daysToAdd <= 0) daysToAdd += 7; // If today or earlier, go to next week
+          targetDate.setDate(today.getDate() + daysToAdd);
+          return formatDate(targetDate);
+        }
+      }
+      
+      // Default to tomorrow if we couldn't parse the date
+      return formatDate(tomorrow);
+    };
+    
+    // Determine which patterns to try first based on activeSection
     let matched = false;
     
-    for (const { pattern, type } of timePatterns) {
-      const match = command.match(pattern);
-      if (match) {
-        console.log(`Match found for time pattern type: ${type}`, match);
-        
-        itemName = match[1].trim();
-        itemTime = match[2].trim();
-        itemLocation = match[3] ? match[3].trim() : "Online";
-        
-        matched = true;
-        isTimeCommand = true;
-        console.log(`Matched time pattern: ${type}`);
-        console.log(`Extracted: name="${itemName}", time="${itemTime}", location="${itemLocation}"`);
-        break;
-      }
-    }
-    
-    // If no time pattern matched, try category patterns
-    if (!matched) {
-      for (const { pattern, type } of categoryPatterns) {
+    // Prioritize patterns based on activeSection
+    if (activeSection === 'todos') {
+      // First try to match to-do patterns
+      for (const { pattern, type } of todoPatterns) {
         const match = command.match(pattern);
         if (match) {
-          console.log(`Match found for pattern type: ${type}`, match);
+          console.log(`Match found for todo pattern type: ${type}`, match);
           
-          if (type === 'addToCategoryIn') {
+          if (type === 'addTodo' || type === 'simpleTodo') {
             itemName = match[1].trim();
-            itemCategory = match[2].trim();
-            itemLocation = match[3].trim();
-          } else if (type === 'addInCategoryAt') {
+            todoPriority = match[2] ? match[2].trim().toLowerCase() : "medium";
+            todoDueDate = match[3] ? parseDueDate(match[3].trim()) : "";
+            todoDetails = match[4] ? match[4].trim() : "";
+          } else if (type === 'createTodo') {
             itemName = match[1].trim();
-            itemCategory = match[2].trim();
-            itemLocation = match[3].trim();
-          } else {
+            todoDueDate = match[2] ? parseDueDate(match[2].trim()) : "";
+            todoPriority = match[3] ? match[3].trim().toLowerCase() : "medium";
+            todoDetails = match[4] ? match[4].trim() : "";
+          } else if (type === 'remindTodo') {
             itemName = match[1].trim();
-            itemLocation = match[2].trim();
-            itemCategory = match[3].trim();
+            todoDueDate = match[2] ? parseDueDate(match[2].trim()) : "";
+            todoPriority = match[3] ? match[3].trim().toLowerCase() : "medium";
+            todoDetails = match[4] ? match[4].trim() : "";
+          } else if (type === 'simpleTodo2' || type === 'simpleTask' || type === 'exactTodo') {
+            // Handle simpler todo patterns
+            itemName = match[1].trim();
+            todoPriority = "medium";
+            todoDueDate = "";
+            todoDetails = "";
           }
+          
+          // Set default location for todo items
+          itemLocation = "To-do";
           matched = true;
-          console.log(`Matched category pattern: ${type}`);
-          console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}"`);
+          isTodoCommand = true;
+          break;
+        }
+      }
+    } else if (activeSection === 'times') {
+      // First try to match time patterns
+      for (const { pattern, type } of timePatterns) {
+        const match = command.match(pattern);
+        if (match) {
+          console.log(`Match found for time pattern type: ${type}`, match);
+          
+          itemName = match[1].trim();
+          itemTime = match[2].trim();
+          itemLocation = match[3] ? match[3].trim() : "Online";
+          
+          matched = true;
+          isTimeCommand = true;
+          console.log(`Matched time pattern: ${type}`);
+          console.log(`Extracted: name="${itemName}", time="${itemTime}", location="${itemLocation}"`);
           break;
         }
       }
     }
     
-    // If no category pattern matched, try basic patterns
+    // If no match found yet based on activeSection priority, try other patterns
     if (!matched) {
-      for (const { pattern, type } of basicPatterns) {
-        const match = command.match(pattern);
-        if (match) {
-          itemName = match[1].trim();
-          itemLocation = match[2].trim();
-          matched = true;
-          console.log(`Matched basic pattern: ${type}`);
-          console.log(`Extracted: name="${itemName}", location="${itemLocation}"`);
-          break;
+      // If we're not in todos section or no todo match was found, try time patterns
+      if (activeSection !== 'times') {
+        for (const { pattern, type } of timePatterns) {
+          const match = command.match(pattern);
+          if (match) {
+            console.log(`Match found for time pattern type: ${type}`, match);
+            
+            itemName = match[1].trim();
+            itemTime = match[2].trim();
+            itemLocation = match[3] ? match[3].trim() : "Online";
+            
+            matched = true;
+            isTimeCommand = true;
+            console.log(`Matched time pattern: ${type}`);
+            console.log(`Extracted: name="${itemName}", time="${itemTime}", location="${itemLocation}"`);
+            break;
+          }
+        }
+      }
+      
+      // If we're not in todos section or no match was found yet, try todo patterns
+      if (!matched && activeSection !== 'todos') {
+        for (const { pattern, type } of todoPatterns) {
+          const match = command.match(pattern);
+          if (match) {
+            console.log(`Match found for todo pattern type: ${type}`, match);
+            
+            if (type === 'addTodo' || type === 'simpleTodo') {
+              itemName = match[1].trim();
+              todoPriority = match[2] ? match[2].trim().toLowerCase() : "medium";
+              todoDueDate = match[3] ? parseDueDate(match[3].trim()) : "";
+              todoDetails = match[4] ? match[4].trim() : "";
+            } else if (type === 'createTodo') {
+              itemName = match[1].trim();
+              todoDueDate = match[2] ? parseDueDate(match[2].trim()) : "";
+              todoPriority = match[3] ? match[3].trim().toLowerCase() : "medium";
+              todoDetails = match[4] ? match[4].trim() : "";
+            } else if (type === 'remindTodo') {
+              itemName = match[1].trim();
+              todoDueDate = match[2] ? parseDueDate(match[2].trim()) : "";
+              todoPriority = match[3] ? match[3].trim().toLowerCase() : "medium";
+              todoDetails = match[4] ? match[4].trim() : "";
+            } else if (type === 'simpleTodo2' || type === 'simpleTask' || type === 'exactTodo') {
+              // Handle simpler todo patterns
+              itemName = match[1].trim();
+              todoPriority = "medium";
+              todoDueDate = "";
+              todoDetails = "";
+            }
+            
+            // Set default location for todo items
+            itemLocation = "To-do";
+            matched = true;
+            isTodoCommand = true;
+            break;
+          }
+        }
+      }
+      
+      // If no match yet, try category patterns
+      if (!matched) {
+        for (const { pattern, type } of categoryPatterns) {
+          const match = command.match(pattern);
+          if (match) {
+            console.log(`Match found for pattern type: ${type}`, match);
+            
+            if (type === 'addToCategoryIn') {
+              itemName = match[1].trim();
+              itemCategory = match[2].trim();
+              itemLocation = match[3].trim();
+            } else if (type === 'addInCategoryAt') {
+              itemName = match[1].trim();
+              itemCategory = match[2].trim();
+              itemLocation = match[3].trim();
+            } else {
+              itemName = match[1].trim();
+              itemLocation = match[2].trim();
+              itemCategory = match[3].trim();
+            }
+            matched = true;
+            console.log(`Matched category pattern: ${type}`);
+            console.log(`Extracted: name="${itemName}", location="${itemLocation}", category="${itemCategory}"`);
+            break;
+          }
+        }
+      }
+      
+      // If still no match, try basic patterns
+      if (!matched) {
+        for (const { pattern, type } of basicPatterns) {
+          const match = command.match(pattern);
+          if (match) {
+            itemName = match[1].trim();
+            itemLocation = match[2].trim();
+            matched = true;
+            console.log(`Matched basic pattern: ${type}`);
+            console.log(`Extracted: name="${itemName}", location="${itemLocation}"`);
+            break;
+          }
         }
       }
     }
@@ -196,23 +378,44 @@ const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories })
             itemTime = `${itemTime}:00`;
           }
         }
-        
-        // Call the onAddTime function with the extracted information
-        onAddTime(itemName, itemLocation, itemTime);
-        console.log("Added time:", { itemName, itemLocation, itemTime });
-      } else {
-        // Call the onAddItem function with the extracted information
-        onAddItem(itemName, itemLocation, itemCategory);
-        console.log("Added item:", { itemName, itemLocation, itemCategory });
       }
+    }
+    
+    // Execute the command
+    if (matched) {
+      if (isTodoCommand) {
+        console.log("Executing todo command with:", { itemName, itemLocation, itemCategory, todoPriority, todoDueDate, todoDetails });
+        
+        // Create a to-do object with the parsed information
+        const todoItem = {
+          name: itemName,
+          location: itemLocation,
+          catagory: itemCategory, // Note: using catagory with 'a' to match Recent.jsx
+          priority: todoPriority,
+          dueDate: todoDueDate,
+          details: todoDetails,
+          isTodo: true
+        };
+        
+        // Add the to-do item
+        onAddItem(itemName, itemLocation, itemCategory, todoItem);
+      } else if (isTimeCommand) {
+        console.log("Executing time command with:", { itemName, itemLocation, itemTime });
+        onAddTime(itemName, itemLocation, itemTime);
+      } else {
+        console.log("Executing item command with:", { itemName, itemLocation, itemCategory });
+        onAddItem(itemName, itemLocation, itemCategory);
+      }
+      
+      // Clear the text after processing
+      setText("");
+      setStatus("not listening");
     } else {
       console.log("No pattern matched for command:", command);
-      // Could show a message to the user that the command wasn't understood
+      alert("Sorry, I didn't understand that command. Try again or check the help for examples.");
     }
-    setStatus("not listening");
-    setText("");
-  }, [text, setText, onAddItem, categories, onAddTime]);
-
+  }, [text, setText, onAddItem, onAddTime, categories, activeSection]);
+  
   const cancelListening = useCallback(() => {
     setStatus("not listening");
     setText("");
@@ -298,6 +501,17 @@ const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories })
                   <li><strong>"Set a reminder for dentist at 2:30 PM"</strong> - Create a timed event</li>
                   <li><strong>"Add time for meeting at 4:00 PM"</strong> - Add a time-based item</li>
                   <li><strong>"Meeting at 3:00 PM in office"</strong> - Quick time addition with location</li>
+                </ul>
+              </div>
+              
+              <div className="help-section">
+                <h4>To-Do Commands</h4>
+                <ul>
+                  <li><strong>"Add to-do buy groceries"</strong> - Simple to-do creation</li>
+                  <li><strong>"Create to-do finish report due Friday"</strong> - To-do with due date</li>
+                  <li><strong>"To-do call mom with high priority"</strong> - To-do with priority</li>
+                  <li><strong>"Remind me to pay bills due tomorrow with high priority"</strong> - Complete to-do</li>
+                  <li><strong>"Add to-do meeting notes details discuss project timeline"</strong> - With details</li>
                 </ul>
               </div>
               

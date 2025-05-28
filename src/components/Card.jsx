@@ -60,7 +60,7 @@ const Card = ({
     <>
       <div
         className={`item ${expanded ? "expanded" : "collapsed"} ${
-          isDeleting ? "deleting" : ""
+          isDeleting ? "deleting" : "" 
         } ${isNameRTL ? "rtl" : "ltr"} ${isCompleted ? "completed" : ""} ${isTodo ? "todo-item" : ""}`}
         onAnimationEnd={isDeleting ? () => onRemove() : undefined}
         style={{ touchAction: "manipulation" }}
