@@ -19,64 +19,71 @@ import {
   faGlasses,
 } from "@fortawesome/free-solid-svg-icons";
 
-function Recent({darkMode, speechLanguage, categories}) {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Wallet (Example)",
-      location: "On the bed",
-      catagory: "Personal",
-    },
-    {
-      id: 2,
-      name: "Keys (Example)",
-      location: "In the drawer",
-      catagory: "Personal",
-    },
-  ]);
+function Recent({ darkMode, speechLanguage, categories }) {
+  const [items, setItems] = useState([]);
 
   // Get the appropriate FontAwesome icon based on the icon name
   const getIconFromName = (iconName) => {
-    switch(iconName) {
-      case "faUser": return faUser;
-      case "faBriefcase": return faBriefcase;
-      case "faHome": return faHome;
-      case "faBook": return faBook;
-      case "faLaptop": return faLaptop;
-      case "faPhone": return faPhone;
-      case "faCar": return faCar;
-      case "faKey": return faKey;
-      case "faWallet": return faWallet;
-      case "faGlasses": return faGlasses;
-      default: return faUser; // Default fallback
+    switch (iconName) {
+      case "faUser":
+        return faUser;
+      case "faBriefcase":
+        return faBriefcase;
+      case "faHome":
+        return faHome;
+      case "faBook":
+        return faBook;
+      case "faLaptop":
+        return faLaptop;
+      case "faPhone":
+        return faPhone;
+      case "faCar":
+        return faCar;
+      case "faKey":
+        return faKey;
+      case "faWallet":
+        return faWallet;
+      case "faGlasses":
+        return faGlasses;
+      default:
+        return faUser; // Default fallback
     }
   };
-  
+
   // Convert categories from props to the format expected by the Card component
-  const catagories = categories ? categories.map(cat => ({
-    name: cat.name,
-    emoji: <FontAwesomeIcon className="catagory-icon" icon={getIconFromName(cat.icon)} />
-  })) : [
-    {
-      name: "Personal",
-      emoji: <FontAwesomeIcon className="catagory-icon" icon={faUser} />,
-    },
-    {
-      name: "Work",
-      emoji: <FontAwesomeIcon className="catagory-icon" icon={faBriefcase} />,
-    },
-    {
-      name: "Home",
-      emoji: <FontAwesomeIcon className="catagory-icon" icon={faHome} />,
-    },
-  ];
+  const catagories = categories
+    ? categories.map((cat) => ({
+        name: cat.name,
+        emoji: (
+          <FontAwesomeIcon
+            className="catagory-icon"
+            icon={getIconFromName(cat.icon)}
+          />
+        ),
+      }))
+    : [
+        {
+          name: "Personal",
+          emoji: <FontAwesomeIcon className="catagory-icon" icon={faUser} />,
+        },
+        {
+          name: "Work",
+          emoji: (
+            <FontAwesomeIcon className="catagory-icon" icon={faBriefcase} />
+          ),
+        },
+        {
+          name: "Home",
+          emoji: <FontAwesomeIcon className="catagory-icon" icon={faHome} />,
+        },
+      ];
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [addTime, setAddTime] = useState(false);
   const [catagory, setCatagory] = useState("Personal");
-  const [searchtype, setSearchType] = useState("name")
+  const [searchtype, setSearchType] = useState("name");
 
   const [addItemScreen, setAddItemScreen] = useState(false);
 
@@ -84,28 +91,31 @@ function Recent({darkMode, speechLanguage, categories}) {
 
   const [currentFilter, setCurrentFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSection, setActiveSection] = useState("items"); // 'items' or 'times'
 
   const handleRemove = (id) => {
     setItems(items.filter((item) => item.id !== id));
   };
 
   const handleAddItem = (name, location, category = catagory) => {
-    if (!name || !location) {
-      alert("Please enter a name and location");
+    if (!name) {
+      alert("Please enter a name");
       return;
     }
-    if (items.some((item) => item.name === name)) {
-      alert(
-        "Item with this name already exists you can change the location from the list"
-      );
+    if (!location) {
+      alert("Please enter a location");
       return;
     }
-    
+
     // Validate that the category exists in our categories list
-    const validCategory = categories ? 
-      categories.find(cat => cat.name.toLowerCase() === category.toLowerCase())?.name : 
-      catagories.find(cat => cat.name.toLowerCase() === category.toLowerCase())?.name;
-    
+    const validCategory = categories
+      ? categories.find(
+          (cat) => cat.name.toLowerCase() === category.toLowerCase()
+        )?.name
+      : catagories.find(
+          (cat) => cat.name.toLowerCase() === category.toLowerCase()
+        )?.name;
+
     setItems([
       ...items,
       {
@@ -121,14 +131,12 @@ function Recent({darkMode, speechLanguage, categories}) {
   };
 
   const handleAddTime = (name, location, time) => {
-    if (!name || !time) {
-      alert("Please enter a name and time");
+    if (!name) {
+      alert("Please enter a name");
       return;
     }
-    if (items.some((item) => item.name === name)) {
-      alert(
-        "Item with this name already exists you can change the location from the list"
-      );
+    if (!time) {
+      alert("Please enter a time");
       return;
     }
     setItems([
@@ -211,10 +219,21 @@ function Recent({darkMode, speechLanguage, categories}) {
   };
 
   const getFilteredItems = () => {
-    let filtered = currentFilter === "All" 
-      ? items 
-      : items.filter((item) => item.catagory === currentFilter);
-    
+    // First filter by active section (items or times)
+    let filtered = items.filter((item) => {
+      if (activeSection === "items") {
+        return !item.time; // Show only items without time property
+      } else {
+        return item.time; // Show only items with time property
+      }
+    });
+
+    // Then filter by category if not 'All'
+    if (currentFilter !== "All") {
+      filtered = filtered.filter((item) => item.catagory === currentFilter);
+    }
+
+    // Finally filter by search term if present
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter((item) => {
         const propertyToSearch = searchtype.toLowerCase();
@@ -226,13 +245,13 @@ function Recent({darkMode, speechLanguage, categories}) {
         return false;
       });
     }
-    
+
     return filtered;
   };
 
-  const handleSearchChange = (e) =>{
+  const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-  }
+  };
 
   useEffect(() => {
     const storedItems = localStorage.getItem("items");
@@ -266,61 +285,115 @@ function Recent({darkMode, speechLanguage, categories}) {
   return (
     <>
       <div className="item-container" data-theme={darkMode ? "dark" : "light"}>
-        <h2>Your Folks:</h2>
-        <div className="search-bar">
-          <input type="text" placeholder="Search..." className="catagory-select search-input" onChange={(e) => handleSearchChange(e)} value={searchTerm} />
-          <select className="select-what-search-for" onChange={(e) => setSearchType(e.target.value)}>
-            <option value="name">Name</option>
-            <option value="location">Location</option>
-          </select>
-        </div>
-        <select onChange={(e) => handleCatagoryFilterChange(e.target.value)} className="catagories-filter-select catagory-select">
-          <option value="All">All Categories</option>
-          {
-            catagories.map((cata) => (
-              <option key={cata.name} value={cata.name}>{cata.name}</option>
-            ))
-          }
-        </select>
-        {getFilteredItems().length === 0 ? (
-          <div className="empty">
-            <p>No Folks here!</p>
+        <div className="up">
+          <h2>Your Folks:</h2>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="catagory-select search-input"
+              onChange={(e) => handleSearchChange(e)}
+              value={searchTerm}
+            />
+            <select
+              className="select-what-search-for"
+              onChange={(e) => setSearchType(e.target.value)}
+            >
+              <option value="name">Name</option>
+              <option value="location">Location</option>
+            </select>
           </div>
-        ) : (
-          getFilteredItems().map((item) => (
-            <Card
-              key={item.id}
-              name={item.name}
-              location={item.location}
-              time={item.time}
-              catagory={item.catagory}
-              catagories={catagories}
-              onRemove={() => handleRemove(item.id)}
-              onLocationChange={(newLocation) =>
-                handleLocationChange(item.id, newLocation)
-              }
-              onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
-              onCatagoryChange={(newCatagory) =>
-                handleCatagoryChange(item.id, newCatagory)
+          <select
+            onChange={(e) => handleCatagoryFilterChange(e.target.value)}
+            className="catagories-filter-select catagory-select"
+          >
+            <option value="All">All Categories</option>
+            {catagories.map((cata) => (
+              <option key={cata.name} value={cata.name}>
+                {cata.name}
+              </option>
+            ))}
+          </select>
+          {getFilteredItems().length === 0 ? (
+            <div className="empty">
+              <p>No Folks here!</p>
+            </div>
+          ) : (
+            getFilteredItems().map((item) => (
+              <Card
+                key={item.id}
+                name={item.name}
+                location={item.location}
+                time={item.time}
+                catagory={item.catagory}
+                catagories={catagories}
+                onRemove={() => handleRemove(item.id)}
+                onLocationChange={(newLocation) =>
+                  handleLocationChange(item.id, newLocation)
+                }
+                onTimeChange={(newTime) => handleTimeChange(item.id, newTime)}
+                onCatagoryChange={(newCatagory) =>
+                  handleCatagoryChange(item.id, newCatagory)
+                }
+              />
+            ))
+          )}
+        </div>
+        <div className="buttom">
+          <div className="add">
+            {activeSection === "items" ? (
+              <button
+                className="add-button"
+                onClick={() => setAddItemScreen(true)}
+              >
+                <span>Add item</span>
+              </button>
+            ) : (
+              <button
+                className="add-button"
+                onClick={() => handleAddTimeScreen()}
+              >
+                <p>Add time</p>
+              </button>
+            )}
+          </div>
+          <div className="speech-recognition-container">
+            <SpeechRecognition
+              aria-label="Start speech recognition"
+              onAddItem={handleAddItem}
+              speechLanguage={speechLanguage}
+              categories={
+                categories ||
+                catagories.map((cat) => ({
+                  name: cat.name,
+                  icon:
+                    cat.name === "Personal"
+                      ? "faUser"
+                      : cat.name === "Work"
+                      ? "faBriefcase"
+                      : "faHome",
+                }))
               }
             />
-          ))
-        )}
-        <div className="add">
-          <button className="add-button" onClick={() => setAddItemScreen(true)}>
-            Add item
-          </button>
-          <button className="add-button" onClick={() => handleAddTimeScreen()}>
-            Add time
-          </button>
-        </div>
-        <div className="speech-recognition-container">
-          <SpeechRecognition 
-            aria-label="Start speech recognition" 
-            onAddItem={handleAddItem} 
-            speechLanguage={speechLanguage}
-            categories={categories || catagories.map(cat => ({ name: cat.name, icon: cat.name === "Personal" ? "faUser" : cat.name === "Work" ? "faBriefcase" : "faHome" }))} 
-          />
+          </div>
+          <div className="sections-choose">
+            <div
+              className={`section-btn ${
+                activeSection === "items" ? "active" : ""
+              }`}
+              onClick={() => setActiveSection("items")}
+            >
+              Items
+            </div>
+            <div
+              className={`section-btn ${
+                activeSection === "times" ? "active" : ""
+              }`}
+              onClick={() => setActiveSection("times")}
+            >
+              Times
+            </div>
+          </div>
         </div>
       </div>
       {addItemScreen && (

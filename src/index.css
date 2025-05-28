@@ -28,11 +28,11 @@
 }
 
 #root {
-  height: 100%;
+  height: 100vh;
 }
 
 main {
-  height: 100%;
+  height: 100vh;
 }
 
 body {
@@ -41,6 +41,9 @@ body {
   color: #222;
   background-color: var(--primary-color);
   height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 a {
@@ -57,7 +60,7 @@ a:hover {
   text-decoration: underline;
 }
 
-h1 img{
+h1 img {
   width: 50px;
 }
 
@@ -122,19 +125,23 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: auto;
+  height: 100vh;
   animation: fadeIn 0.8s var(--cubic-bezier) forwards;
+  overflow: hidden;
+  position: relative;
 }
 
 .item-container {
   width: 80%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px 10px 0px 0px;
   padding: 10px;
-  height: auto;
-  min-height: calc(100vh - 50px);
+  padding-bottom: 0px;
+  height: 100vh;
+  overflow-x: scroll;
 }
 
 .item-container h2 {
@@ -221,11 +228,16 @@ button:disabled {
   border-radius: 10px 10px 0px 0px;
   align-items: center;
 }
-
 .item.rtl .item-info {
   flex-direction: row-reverse;
 }
-
+.up{
+  min-height: 76%;
+  max-height: 450px;
+  border-radius: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 /* RTL Support for Arabic */
 .item.rtl .item-info-header {
   direction: rtl;
@@ -256,23 +268,31 @@ button:disabled {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: auto;
+  margin-top: 10px;
   gap: 10px;
 }
 
 .add-button {
   background-color: var(--accent-color);
   padding: 10px;
+  margin-bottom: 5px;
   border-radius: 10px;
   color: #fff;
   font-size: 16px;
   font-weight: 500;
-  width: 90%;
+  width: 100%;
   border: none;
   transition: all 0.3s ease-in-out;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.add-button span {
+  animation: forwards fadeIn 0.5s;
+}
+
+.add-button p {
+  animation: forwards fadeIn 0.5s;
+}
 .add-button:hover {
   cursor: pointer;
   background-color: var(--hover-color);
@@ -293,10 +313,10 @@ button:disabled {
 }
 
 @keyframes fadeIn {
-  from {
+  0% {
     opacity: 0;
   }
-  to {
+  100% {
     opacity: 1;
   }
 }
@@ -399,11 +419,12 @@ button:disabled {
   animation: fadeOut 0.5s forwards;
 }
 @keyframes fadeOut {
-  from {
+  0% {
     opacity: 1;
   }
-  to {
+  100% {
     opacity: 0;
+    translate: 100px;
   }
 }
 .time-informations-wrapper {
@@ -415,6 +436,7 @@ button:disabled {
 .speech-recognition-container {
   width: 100%;
   margin-top: 2px;
+  margin-bottom: 5px;
 }
 .speech-recognition {
   display: flex;
@@ -458,9 +480,10 @@ button:disabled {
   background-color: var(--secondary-color);
   padding-left: 10px;
 }
-.cata-edit{
-  border: var(--border-dark-color) 1px solid;
+.cata-edit {
+  border: var(--accent-color) 1px dashed;
   border-radius: 10px;
+  box-shadow: 0 0px 3px rgba(0, 0, 0, 0.2);
   padding: 5px;
   display: flex;
   align-items: center;
@@ -471,12 +494,11 @@ button:disabled {
   height: 50px;
 }
 .empty {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  animation: forwards fadeIn 0.5s;
 }
 .catagory-emoji-wrapper {
   display: flex;
@@ -544,29 +566,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.help-button {
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.help-button:hover {
-  background-color: var(--hover-color);
-  transform: translateY(-50%) scale(1.1);
 }
 
 .help-overlay {
@@ -728,7 +727,7 @@ header {
   padding-bottom: 10px;
 }
 
-.settings-header h3{
+.settings-header h3 {
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--accent-color);
@@ -833,14 +832,14 @@ header {
   display: flex;
   justify-content: flex-start;
 }
-.show-categories .header h3{
+.show-categories .header h3 {
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--accent-color);
   margin: 0;
 }
-.catagory-screen-button{
-  padding: 5px;  
+.catagory-screen-button {
+  padding: 5px;
   height: 30px;
   border: 1px solid var(--accent-color);
   padding: 5px;
@@ -850,7 +849,8 @@ header {
   cursor: pointer;
   animation: fadeIn 0.5s var(--cubic-bezier) forwards;
   animation-delay: 0.2s;
-  transition: background-color 0.3s var(--cubic-bezier), border-color 0.3s var(--cubic-bezier), color 0.3s var(--cubic-bezier);
+  transition: background-color 0.3s var(--cubic-bezier),
+    border-color 0.3s var(--cubic-bezier), color 0.3s var(--cubic-bezier);
 }
 
 [data-theme="dark"] .catagory-screen-button {
@@ -862,6 +862,49 @@ header {
 .catagory-screen-button:hover {
   background-color: var(--accent-color);
   color: white;
+}
+
+.sections-choose {
+  width: 100%;
+  height: 35px;
+  background-color: var(--secondary-color);
+  display: flex;
+  justify-content: space-between;
+  border-radius: 10px 10px 0px 0px;
+  overflow: hidden;
+}
+
+.section-btn {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s var(--cubic-bezier),
+    color 0.3s var(--cubic-bezier);
+}
+
+.section-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.section-btn:hover:not(.active) {
+  background-color: rgba(122, 129, 255, 0.1);
+}
+
+[data-theme="dark"] .sections-choose {
+  background-color: var(--secondary-dark-color);
+  border: 1px solid var(--border-dark-color);
+}
+
+[data-theme="dark"] .section-btn.active {
+  background-color: var(--accent-dark-color);
+}
+
+[data-theme="dark"] .section-btn:hover:not(.active) {
+  background-color: rgba(138, 144, 255, 0.1);
 }
 
 [data-theme="dark"] .catagory-screen-button:hover {
@@ -1024,11 +1067,6 @@ header {
   color: var(--text-dark-color);
 }
 
-[data-theme="dark"] .help-button {
-  color: var(--primary-dark-color);
-}
-
 [data-theme="dark"] .add-button {
   color: var(--primary-dark-color);
 }
-

@@ -6,7 +6,6 @@ import {
   faMicrophoneSlash,
   faPaperPlane,
   faXmark,
-  faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
@@ -17,7 +16,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
 
   // Update status based on listening state and text content
   useEffect(() => {
-    if (!isListening && text) {
+    if (!isListening && text && text !== 'help') {
       setStatus("listened");
     } else if (isListening && !text) {
       setStatus("listening");
@@ -25,6 +24,10 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
       setStatus("not listening");
     }
   }, [isListening, text]);
+
+  useEffect(() => {
+    text === "help" ? setShowHelp(true) : null
+  }, [text]);
 
   // Use useCallback to memoize the handleCommand function
   const handleCommand = useCallback(() => {
@@ -154,7 +157,7 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
           placeholder={
             status === "listening"
               ? "Listening... (Try: 'Add keys to drawer in Work category')"
-              : "Tap mic and say: 'Add keys to drawer in Work category'"
+              : "Say help If you stuck"
           }
           onClick={cancelListening}
           readOnly
@@ -191,13 +194,6 @@ const SpeechRecognition = ({ onAddItem, speechLanguage, categories }) => {
           ) : (
             <FontAwesomeIcon icon={faMicrophone} />
           )}
-        </button>
-        <button 
-          className="help-button"
-          onClick={() => setShowHelp(true)}
-          aria-label="Show voice command help"
-        >
-          <FontAwesomeIcon icon={faCircleQuestion} />
         </button>
       </div>
       {showHelp && (
