@@ -647,42 +647,6 @@ const Habits = ({ darkMode }) => {
     setShowStats(true);
   };
 
-  // Calculate habit completion rate
-  const getHabitCompletionRate = (habitId) => {
-    const stats = habitStats[habitId];
-    if (!stats) return 0;
-
-    const habit = habits.find((h) => h.id === habitId);
-    if (!habit) return 0;
-
-    // Count days since habit creation where the habit was scheduled
-    const creationDate = new Date(habit.createdAt);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let scheduledDays = 0;
-    let completedDays = 0;
-
-    for (
-      let d = new Date(creationDate);
-      d <= today;
-      d.setDate(d.getDate() + 1)
-    ) {
-      // Only count if habit is scheduled for this day
-      if (isHabitActiveOnDay(habit, d)) {
-        scheduledDays++;
-        const dateStr = d.toISOString().split("T")[0];
-        if ((stats.completions?.[dateStr] || 0) >= habit.goal) {
-          completedDays++;
-        }
-      }
-    }
-
-    return scheduledDays > 0
-      ? Math.round((completedDays / scheduledDays) * 100)
-      : 0;
-  };
-
   // Get the last 7 days of habit data
   const getWeeklyData = (habitId) => {
     const stats = habitStats[habitId] || {};
@@ -1224,18 +1188,6 @@ const Habits = ({ darkMode }) => {
                       style={{ color: "#4caf50" }}
                     />{" "}
                     Total Completions
-                  </div>
-                </div>
-                <div className="stat-box">
-                  <div className="stat-value">
-                    {getHabitCompletionRate(selectedHabit.id)}%
-                  </div>
-                  <div className="stat-label">
-                    <FontAwesomeIcon
-                      icon={faChartLine}
-                      style={{ color: "#2196f3" }}
-                    />{" "}
-                    Completion Rate
                   </div>
                 </div>
                 <div className="stat-box">
