@@ -511,13 +511,16 @@ const Habits = ({ darkMode }) => {
   // Mark a habit as completed for a specific date
   const completeHabitOnDate = (habitId, date) => {
     // Get the date string in YYYY-MM-DD format for today
-    const dateStr = new Date(date).toISOString().split('T')[0];
-    
+    const dateStr = new Date(date).toISOString().split("T")[0];
+
     // Update habit stats for the correct date
     setHabitStats((prevStats) => {
-      const habitStat = prevStats[habitId] || { completions: {}, totalCompletions: 0 };
+      const habitStat = prevStats[habitId] || {
+        completions: {},
+        totalCompletions: 0,
+      };
       const newCompletions = { ...habitStat.completions };
-      
+
       // Toggle completion for the exact date selected
       if (newCompletions[dateStr]) {
         delete newCompletions[dateStr];
@@ -530,8 +533,8 @@ const Habits = ({ darkMode }) => {
         [habitId]: {
           ...habitStat,
           completions: newCompletions,
-          totalCompletions: Object.keys(newCompletions).length
-        }
+          totalCompletions: Object.keys(newCompletions).length,
+        },
       };
     });
   };
@@ -652,18 +655,32 @@ const Habits = ({ darkMode }) => {
     const habit = habits.find((h) => h.id === habitId);
     if (!habit) return 0;
 
-    // Count days since habit creation
+    // Count days since habit creation where the habit was scheduled
     const creationDate = new Date(habit.createdAt);
     const today = new Date();
-    const diffTime = Math.abs(today - creationDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    today.setHours(0, 0, 0, 0);
 
-    // Count days where the habit was completed
-    const completedDays = Object.entries(stats.completions).filter(
-      ([, count]) => count >= habit.goal
-    ).length;
+    let scheduledDays = 0;
+    let completedDays = 0;
 
-    return diffDays > 0 ? Math.round((completedDays / diffDays) * 100) : 0;
+    for (
+      let d = new Date(creationDate);
+      d <= today;
+      d.setDate(d.getDate() + 1)
+    ) {
+      // Only count if habit is scheduled for this day
+      if (isHabitActiveOnDay(habit, d)) {
+        scheduledDays++;
+        const dateStr = d.toISOString().split("T")[0];
+        if ((stats.completions?.[dateStr] || 0) >= habit.goal) {
+          completedDays++;
+        }
+      }
+    }
+
+    return scheduledDays > 0
+      ? Math.round((completedDays / scheduledDays) * 100)
+      : 0;
   };
 
   // Get the last 7 days of habit data
@@ -814,9 +831,7 @@ const Habits = ({ darkMode }) => {
                       ></div>
                     </div>
                     <div className="progress-text">
-                      {habitStats[habit.id]?.completions[
-                        new Date().toISOString().split("T")[0]
-                      ] || 0}{" "}
+                      {todayCount + " "}
                       / {habit.goal}
                     </div>
                   </div>
@@ -1243,8 +1258,8 @@ const Habits = ({ darkMode }) => {
                 </div>
               </div>
 
+              <h4>Last 7 Days</h4> <br />
               <div className="weekly-progress">
-                <h4>Last 7 Days</h4>
                 <div className="weekly-chart">
                   {getWeeklyData(selectedHabit.id).map((day, index) => (
                     <div key={index} className="day-progress">
