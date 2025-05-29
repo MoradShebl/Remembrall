@@ -813,7 +813,7 @@ header {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  padding-inline: 35px;
+  padding: 5px;
 }
 
 .mode-icon {

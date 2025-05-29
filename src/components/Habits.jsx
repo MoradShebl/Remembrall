@@ -952,23 +952,6 @@ const Habits = ({ darkMode }) => {
                 </div>
                 <div className="habit-completion">
                   {habit.completed} / {habit.goal}
-                  <button
-                    className="habit-complete"
-                    style={{
-                      marginLeft: 8,
-                      background: habit.color,
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "2px 8px",
-                      cursor: "pointer",
-                    }}
-                    disabled={habit.completed >= habit.goal}
-                    onClick={() => completeHabitOnDate(habit.id, selectedDate)}
-                    title="Mark as completed for this day"
-                  >
-                    <FontAwesomeIcon icon={faCheck} />
-                  </button>
                 </div>
               </div>
             ))}
