@@ -3,7 +3,7 @@ import { Moon, Sun } from "lucide-react";
 import Recent from "./components/Recent.jsx";
 import Habits from "./components/Habits.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faX, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faX, faTrash, faPalette } from "@fortawesome/free-solid-svg-icons";
 import nameLogo from "./assets/logo.png";
 import "./components/Habits.css";
 import "./components/AppSectionNav.css";
@@ -23,6 +23,23 @@ function App() {
     const savedSection = localStorage.getItem("activeSection");
     return savedSection || "items";
   });
+  const [defaultHabitColor, setDefaultHabitColor] = useState("#4CAF50");
+  const [defaultHabitGoal, setDefaultHabitGoal] = useState(1);
+  const [showCompletedHabits, setShowCompletedHabits] = useState(true);
+  const [customAccent, setCustomAccent] = useState("#4a90e2");
+  const [customBackground, setCustomBackground] = useState("#fff");
+  const [showCustomTheme, setShowCustomTheme] = useState(false);
+
+  const resetAllData = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to reset all data? This cannot be undone."
+      )
+    ) {
+      localStorage.clear();
+      window.location.reload();
+    }
+  };
 
   // Load categories from localStorage or use defaults
   const defaultCategories = [
@@ -83,6 +100,11 @@ function App() {
       console.error("Error saving categories to localStorage:", error);
     }
   }, [categories]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent-color', customAccent);
+    document.documentElement.style.setProperty('--primary-color', customBackground);
+  }, [customAccent, customBackground]);
 
   const toggleTheme = () => {
     setIsTransitioning(true);
@@ -149,7 +171,28 @@ function App() {
           data-theme={darkMode ? "dark" : "light"}
         >
           <header>
-            <h1><img src={nameLogo} alt="Remembrall"/></h1>
+            <h1>
+              <img src={nameLogo} alt="Remembrall" />
+            </h1>
+            {/* App Section Navigation */}
+            <div className="app-section-nav">
+              <button
+                className={`section-btn ${
+                  activeSection === "items" ? "active" : ""
+                }`}
+                onClick={() => setActiveSection("items")}
+              >
+                Items & Todos
+              </button>
+              <button
+                className={`section-btn ${
+                  activeSection === "habits" ? "active" : ""
+                }`}
+                onClick={() => setActiveSection("habits")}
+              >
+                Habit Tracker
+              </button>
+            </div>
             <div className="settings-container">
               <button
                 className="settings-btn"
@@ -195,6 +238,13 @@ function App() {
                         <Moon className="mode-icon" size={24} />
                       )}
                     </button>
+                    <button
+                      className="toggle-btn custom-theme-btn"
+                      onClick={() => setShowCustomTheme(true)}
+                      aria-label="Customize theme colors"
+                    >
+                      <FontAwesomeIcon icon={faPalette} size={20} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -205,9 +255,7 @@ function App() {
                     <select
                       className="language-select"
                       value={speechLanguage}
-                      onChange={(e) => {
-                        setSpeechLanguage(e.target.value);
-                      }}
+                      onChange={(e) => setSpeechLanguage(e.target.value)}
                     >
                       <option value="en">English</option>
                       <option value="ar">Arabic</option>
@@ -217,16 +265,55 @@ function App() {
               </div>
               <div className="settings-content">
                 <div className="settings-item">
-                  <h3>Add Cata</h3>
-                  <div className="settings-item-content">
-                    <div className="settings-item">
-                      <button
-                        className="catagory-screen-button"
-                        onClick={() => setshowCataScreen(true)}
-                      >
-                        Categories
-                      </button>
-                    </div>
+                  <h3>Default Habit Color</h3>
+                  <input
+                    type="color"
+                    value={defaultHabitColor}
+                    onChange={(e) => setDefaultHabitColor(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="settings-content">
+                <div className="settings-item">
+                  <h3>Default Habit Goal</h3>
+                  <input
+                    type="number"
+                    min={1}
+                    value={defaultHabitGoal}
+                    onChange={(e) =>
+                      setDefaultHabitGoal(Number(e.target.value))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="settings-content">
+                <div className="settings-item">
+                  <h3>Show Completed Habits</h3>
+                  <input
+                    type="checkbox"
+                    checked={showCompletedHabits}
+                    onChange={(e) => setShowCompletedHabits(e.target.checked)}
+                  />
+                </div>
+              </div>
+              <div className="settings-content">
+                <div className="settings-item">
+                  <h3>Reset All Data</h3>
+                  <button
+                    className="add-button"
+                    style={{ background: "#dc2626", color: "#fff" }}
+                    onClick={resetAllData}
+                  >
+                    <FontAwesomeIcon icon={faTrash} /> Reset
+                  </button>
+                </div>
+              </div>
+              <div className="settings-content">
+                <div className="settings-item">
+                  <h3>About</h3>
+                  <div style={{ fontSize: "0.95em", color: "#888" }}>
+                    Remembrall v1.0
+                    <br />
                   </div>
                 </div>
               </div>
@@ -316,32 +403,139 @@ function App() {
               </div>
             </div>
           )}
-          {/* App Section Navigation */}
-          <div className="app-section-nav">
-            <button 
-              className={`section-btn ${activeSection === "items" ? "active" : ""}`}
-              onClick={() => setActiveSection("items")}
-            >
-               Items & Todos
-            </button>
-            <button 
-              className={`section-btn ${activeSection === "habits" ? "active" : ""}`}
-              onClick={() => setActiveSection("habits")}
-            >
-               Habit Tracker
-            </button>
-          </div>
-          
+          {showCustomTheme && (
+            <div className="bg cutom-theme">
+              <div className="custom-theme-screen">
+                <div className="header">
+                  <h2>Customize Theme</h2>
+                  <button 
+                    className="close"
+                    onClick={() => setShowCustomTheme(false)}
+                  >
+                    <FontAwesomeIcon icon={faX} />
+                  </button>
+                </div>
+
+                <div className="theme-preview">
+                  <h3>Preview</h3>
+                  <div 
+                    className="preview-box"
+                    style={{
+                      background: customBackground,
+                      padding: "20px",
+                      borderRadius: "12px",
+                      marginBottom: "24px"
+                    }}
+                  >
+                    <div style={{ color: customAccent, marginBottom: "12px", fontWeight: "600" }}>
+                      Accent Color Text
+                    </div>
+                    <button
+                      className="preview-button"
+                      style={{
+                        background: customAccent,
+                        color: customBackground,
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Sample Button
+                    </button>
+                  </div>
+                </div>
+
+                <div className="theme-colors">
+                  <div className="color-picker-group">
+                    <label>Background Color</label>
+                    <div className="color-input">
+                      <input
+                        type="color"
+                        value={customBackground}
+                        onChange={(e) => setCustomBackground(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        value={customBackground}
+                        onChange={(e) => setCustomBackground(e.target.value)}
+                        placeholder="#ffffff"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="color-picker-group">
+                    <label>Accent Color</label>
+                    <div className="color-input">
+                      <input
+                        type="color"
+                        value={customAccent}
+                        onChange={(e) => setCustomAccent(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        value={customAccent}
+                        onChange={(e) => setCustomAccent(e.target.value)}
+                        placeholder="#7a81ff"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="theme-presets">
+                    <h3>Presets</h3>
+                    <div className="preset-buttons">
+                      <button 
+                        className="preset-btn"
+                        onClick={() => {
+                          setCustomBackground("#f8f8f8");
+                          setCustomAccent("#7a81ff");
+                        }}
+                      >
+                        Light Theme
+                      </button>
+                      <button 
+                        className="preset-btn"
+                        onClick={() => {
+                          setCustomBackground("#1a1a1a");
+                          setCustomAccent("#646cff");
+                        }}
+                      >
+                        Dark Theme
+                      </button>
+                      <button 
+                        className="preset-btn"
+                        onClick={() => {
+                          setCustomBackground("#ffffff");
+                          setCustomAccent("#4a90e2");
+                        }}
+                      >
+                        Classic
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Keep both components mounted but toggle visibility */}
-          <div style={{ display: activeSection === "items" ? "block" : "none" }}>
+          <div
+            style={{ display: activeSection === "items" ? "block" : "none" }}
+          >
             <Recent
+              className="recent-items"
               darkMode={darkMode}
               speechLanguage={speechLanguage}
               categories={categories}
             />
           </div>
-          
-          <div style={{ display: activeSection === "habits" ? "block" : "none", width: "100%"}}>
+
+          <div
+            style={{
+              display: activeSection === "habits" ? "block" : "none",
+              height: "100vh",
+            }}
+          >
             <Habits darkMode={darkMode} />
           </div>
         </div>
