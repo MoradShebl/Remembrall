@@ -8,7 +8,7 @@
 
 :root {
   --primary-color: #f8f8f8;
-  --secondary-color: #edf0e5;
+  --secondary-color: #f8f8f8;
   --accent-color: #7a81ff;
   --hover-color: #646cff;
   --error-color: #dc2626;
@@ -146,8 +146,8 @@ button:disabled {
 }
 
 .item-container {
-  width: 100%;
-  max-width: 1200px;
+  width: 300px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -471,7 +471,7 @@ button:disabled {
   padding: 8px 18px;
   border-radius: 8px;
   border: none;
-  background: var(--accent-color, #4a90e2);
+  background: var(--accent-color);
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
@@ -491,16 +491,16 @@ button:disabled {
   animation: forwards fadeIn 0.5s;
 }
 .add-button:hover {
-  background: var(--hover-color, #357ab8);
+  background: var(--hover-color);
 }
 
 .settings-item a {
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   text-decoration: underline;
   transition: color 0.2s;
 }
 .settings-item a:hover {
-  color: var(--hover-color, #357ab8);
+  color: var(--hover-color);
 }
 @media (max-width: 600px) {
   .settings {
@@ -1056,14 +1056,14 @@ header {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   letter-spacing: 0.01em;
 }
 
 .settings-header .close {
   background: none;
   border: none;
-  color: var(--error-color, #dc2626);
+  color: var(--error-color);
   font-size: 1.7rem;
   cursor: pointer;
   transition: color 0.2s;
@@ -1116,13 +1116,13 @@ header {
 .language-select:focus,
 .settings-item input:focus {
   outline: none;
-  border-color: var(--accent-color, #4a90e2);
+  border-color: var(--accent-color);
 }
 
 .settings-item input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: var(--accent-color, #4a90e2);
+  accent-color: var(--accent-color);
   cursor: pointer;
 }
 
@@ -1146,7 +1146,7 @@ header {
   margin: 0 0 7px 0;
   font-size: 1.08rem;
   font-weight: 600;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
 }
 
 .settings-item-content {
@@ -1242,6 +1242,17 @@ header {
 
 .block{
   height: 100%;
+}
+
+.app-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-logo svg {
+  width: 50px;
+  height: 100%;
+  display: block;
 }
 
 [data-theme="dark"] .sections-choose {

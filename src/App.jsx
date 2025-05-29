@@ -3,8 +3,13 @@ import { Moon, Sun } from "lucide-react";
 import Recent from "./components/Recent.jsx";
 import Habits from "./components/Habits.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faX, faTrash, faPalette } from "@fortawesome/free-solid-svg-icons";
-import nameLogo from "./assets/logo.png";
+import {
+  faGear,
+  faX,
+  faTrash,
+  faPalette,
+} from "@fortawesome/free-solid-svg-icons";
+import logo from "./assets/logo svg.svg";
 import "./components/Habits.css";
 import "./components/AppSectionNav.css";
 
@@ -19,7 +24,6 @@ function App() {
   const [newCataName, setNewCataName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("faUser");
   const [activeSection, setActiveSection] = useState(() => {
-    // Load active section from localStorage or default to 'items'
     const savedSection = localStorage.getItem("activeSection");
     return savedSection || "items";
   });
@@ -102,8 +106,11 @@ function App() {
   }, [categories]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--accent-color', customAccent);
-    document.documentElement.style.setProperty('--primary-color', customBackground);
+    document.documentElement.style.setProperty("--accent-color", customAccent);
+    document.documentElement.style.setProperty(
+      "--primary-color",
+      customBackground
+    );
   }, [customAccent, customBackground]);
 
   const toggleTheme = () => {
@@ -171,8 +178,31 @@ function App() {
           data-theme={darkMode ? "dark" : "light"}
         >
           <header>
-            <h1>
-              <img src={nameLogo} alt="Remembrall" />
+            <h1 className="logo-header">
+              <span
+                className="app-logo"
+                style={{ color: "var(--accent-color)" }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+                  <title>Artboard 1</title>
+                  <path
+                    fill="currentColor"
+                    d="M426,220.43q11.73-20,14-46A207.72,207.72,0,0,0,291.62,47.5q-5-.07-10.16-.08H202.54A207.39,207.39,0,0,0,81.4,125.07a131,131,0,0,0-11.47,53.79V330.68a127.61,127.61,0,0,0,4.87,35A207.64,207.64,0,0,0,197.41,451.4V302.66a11.2,11.2,0,0,1,11.2-11.2,53.25,53.25,0,0,1,31.1,9.52q10.09,7.29,23,31.66l31.37,58.05A128.32,128.32,0,0,0,336.56,437,208.19,208.19,0,0,0,423,359.51l-10.52-20.37q-4.47-9-17.77-25.52T374.4,292q-10.36-7.56-33-15.14,28.31-6.45,44.57-16.25A114,114,0,0,0,426,220.43Zm-112.9-45.85a74.81,74.81,0,1,1-2.2-18,47.77,47.77,0,0,1,2.2,15c0,.37,0,.74,0,1.11C313.11,173.29,313.12,173.93,313.12,174.58Zm62,9a9,9,0,1,1,9-9A9,9,0,0,1,375.14,183.61Z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M426,220.43q11.73-20,14-46A207.37,207.37,0,0,0,81.4,125.07a131,131,0,0,0-11.47,53.79V330.68a127.61,127.61,0,0,0,4.87,35A207.64,207.64,0,0,0,197.41,451.4V302.66a11.2,11.2,0,0,1,11.2-11.2,53.25,53.25,0,0,1,31.1,9.52q10.09,7.29,23,31.66l31.37,58.05A128.32,128.32,0,0,0,336.56,437,208.19,208.19,0,0,0,423,359.51l-10.52-20.37q-4.47-9-17.77-25.52T374.4,292q-10.36-7.56-33-15.14,28.31-6.45,44.57-16.25A114,114,0,0,0,426,220.43Zm-112.9-45.85a74.81,74.81,0,1,1-2.2-18,47.77,47.77,0,0,1,2.2,15c0,.37,0,.74,0,1.11C313.11,173.29,313.12,173.93,313.12,174.58Zm62,9a9,9,0,0,1-9-9.25,9.14,9.14,0,0,1,8.74-8.82,9,9,0,1,1,.3,18.07Z"
+                  />
+                  <ellipse
+                    fill="currentColor"
+                    cx="238.29"
+                    cy="174.57"
+                    rx="56.77"
+                    ry="39.83"
+                    transform="translate(-51.69 118.28) rotate(-25.24)"
+                  />
+                </svg>
+              </span>
             </h1>
             {/* App Section Navigation */}
             <div className="app-section-nav">
@@ -408,7 +438,7 @@ function App() {
               <div className="custom-theme-screen">
                 <div className="header">
                   <h2>Customize Theme</h2>
-                  <button 
+                  <button
                     className="close"
                     onClick={() => setShowCustomTheme(false)}
                   >
@@ -418,16 +448,22 @@ function App() {
 
                 <div className="theme-preview">
                   <h3>Preview</h3>
-                  <div 
+                  <div
                     className="preview-box"
                     style={{
                       background: customBackground,
                       padding: "20px",
                       borderRadius: "12px",
-                      marginBottom: "24px"
+                      marginBottom: "24px",
                     }}
                   >
-                    <div style={{ color: customAccent, marginBottom: "12px", fontWeight: "600" }}>
+                    <div
+                      style={{
+                        color: customAccent,
+                        marginBottom: "12px",
+                        fontWeight: "600",
+                      }}
+                    >
                       Accent Color Text
                     </div>
                     <button
@@ -438,7 +474,7 @@ function App() {
                         border: "none",
                         padding: "8px 16px",
                         borderRadius: "8px",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       Sample Button
@@ -484,7 +520,7 @@ function App() {
                   <div className="theme-presets">
                     <h3>Presets</h3>
                     <div className="preset-buttons">
-                      <button 
+                      <button
                         className="preset-btn"
                         onClick={() => {
                           setCustomBackground("#f8f8f8");
@@ -493,7 +529,7 @@ function App() {
                       >
                         Light Theme
                       </button>
-                      <button 
+                      <button
                         className="preset-btn"
                         onClick={() => {
                           setCustomBackground("#1a1a1a");
@@ -502,7 +538,7 @@ function App() {
                       >
                         Dark Theme
                       </button>
-                      <button 
+                      <button
                         className="preset-btn"
                         onClick={() => {
                           setCustomBackground("#ffffff");
@@ -533,7 +569,8 @@ function App() {
           <div
             style={{
               display: activeSection === "habits" ? "block" : "none",
-              height: "100vh", width: "100%"
+              height: "100vh",
+              width: "100%",
             }}
           >
             <Habits darkMode={darkMode} />

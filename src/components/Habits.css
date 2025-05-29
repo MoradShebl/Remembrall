@@ -340,7 +340,7 @@
 .calendar-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   margin: 0;
   letter-spacing: 0.01em;
 }
@@ -350,7 +350,7 @@
   height: 38px;
   border: none;
   border-radius: 50%;
-  background: var(--accent-color, #4a90e2);
+  background: var(--accent-color);
   color: #fff;
   font-size: 1.3rem;
   cursor: pointer;
@@ -361,10 +361,10 @@
   outline: none;
 }
 .calendar-header button:focus {
-  box-shadow: 0 0 0 2px var(--accent-color, #4a90e2);
+  box-shadow: 0 0 0 2px var(--accent-color);
 }
 .calendar-header button:hover {
-  background: var(--hover-color, #357ab8);
+  background: var(--hover-color);
   transform: scale(1.08);
 }
 
@@ -374,7 +374,7 @@
   text-align: center;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   font-size: 1rem;
   letter-spacing: 0.03em;
   user-select: none;
@@ -408,13 +408,13 @@
 }
 
 .day-cell.today {
-  border: 2px solid var(--accent-color, #4a90e2);
+  border: 2px solid var(--accent-color);
   font-weight: bold;
   background: rgba(74,144,226,0.07);
 }
 
 .day-cell.selected-day {
-  background: var(--accent-color, #4a90e2);
+  background: var(--accent-color);
   color: #fff;
   font-weight: bold;
   box-shadow: 0 2px 8px rgba(74,144,226,0.08);
@@ -434,12 +434,12 @@
 
 .day-cell:hover:not(.empty-cell):not(.selected-day) {
   background: var(--hover-color, #e3e9f7);
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   box-shadow: 0 1px 4px rgba(74,144,226,0.07);
 }
 
 .day-cell:focus-visible {
-  outline: 2px solid var(--accent-color, #4a90e2);
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
@@ -455,7 +455,7 @@
 .selected-date-habits h4 {
   margin: 0 0 10px 0;
   font-size: 1.1rem;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
   font-weight: 700;
 }
 
@@ -467,7 +467,7 @@
   border-radius: 8px;
   margin-bottom: 10px;
   padding: 10px 14px;
-  border-left: 4px solid var(--accent-color, #4a90e2);
+  border-left: 4px solid var(--accent-color);
   transition: background 0.2s;
   box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
@@ -487,7 +487,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--accent-color, #4a90e2);
+  background: var(--accent-color);
   color: #fff;
   display: flex;
   align-items: center;
@@ -511,7 +511,7 @@
 
 .calendar-habit-item .habit-complete {
   margin-left: 8px;
-  background: var(--accent-color, #4a90e2);
+  background: var(--accent-color);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -717,7 +717,6 @@
 
 .template-item:hover {
   transform: translateX(5px);
-  background-color: var(--hover-color);
 }
 
 .template-icon {
@@ -792,7 +791,7 @@
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--accent-color, #4a90e2);
+  color: var(--accent-color);
 }
 
 .stat-label {
