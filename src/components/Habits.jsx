@@ -510,34 +510,28 @@ const Habits = ({ darkMode }) => {
 
   // Mark a habit as completed for a specific date
   const completeHabitOnDate = (habitId, date) => {
-    const dateStr = date.toISOString().split("T")[0];
-    const habit = habits.find((h) => h.id === habitId);
-    if (!habit) return;
-
+    // Get the date string in YYYY-MM-DD format for today
+    const dateStr = new Date(date).toISOString().split('T')[0];
+    
+    // Update habit stats for the correct date
     setHabitStats((prevStats) => {
-      const habitStat = prevStats[habitId] || {
-        completions: {},
-        totalCompletions: 0,
-        currentStreak: 0,
-        bestStreak: 0,
-        lastCompleted: null,
-      };
-      const count = habitStat.completions[dateStr] || 0;
-      if (count >= habit.goal) {
-        alert("Already completed for this day!");
-        return prevStats;
+      const habitStat = prevStats[habitId] || { completions: {}, totalCompletions: 0 };
+      const newCompletions = { ...habitStat.completions };
+      
+      // Toggle completion for the exact date selected
+      if (newCompletions[dateStr]) {
+        delete newCompletions[dateStr];
+      } else {
+        newCompletions[dateStr] = 1;
       }
-      const newCompletions = {
-        ...habitStat.completions,
-        [dateStr]: count + 1,
-      };
+
       return {
         ...prevStats,
         [habitId]: {
           ...habitStat,
           completions: newCompletions,
-          totalCompletions: habitStat.totalCompletions + 1,
-        },
+          totalCompletions: Object.keys(newCompletions).length
+        }
       };
     });
   };

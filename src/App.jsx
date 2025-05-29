@@ -533,7 +533,7 @@ function App() {
           <div
             style={{
               display: activeSection === "habits" ? "block" : "none",
-              height: "100vh",
+              height: "100vh", width: "100%"
             }}
           >
             <Habits darkMode={darkMode} />
