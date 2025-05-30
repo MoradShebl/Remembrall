@@ -24,6 +24,7 @@ const Habits = ({ darkMode }) => {
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState(null);
   const [showStats, setShowStats] = useState(false);
+  const [analyzeHabit, setAnalyzeHabit] = useState(null);
 
   // New habit form state
   const [newHabitName, setNewHabitName] = useState("");
@@ -795,8 +796,7 @@ const Habits = ({ darkMode }) => {
                       ></div>
                     </div>
                     <div className="progress-text">
-                      {todayCount + " "}
-                      / {habit.goal}
+                      {todayCount + " "}/ {habit.goal}
                     </div>
                   </div>
 
@@ -934,6 +934,95 @@ const Habits = ({ darkMode }) => {
                 </div>
               </div>
             ))}
+          </div>
+          {/* Analyze Section */}
+          <div className="calendar-analyze-section">
+            <h4>Analyze</h4>
+            {habits.length === 0 ? (
+              <div style={{ color: "#888" }}>No habits to analyze.</div>
+            ) : (
+              habits.map((habit) => (
+                <div key={habit.id} className="analyze-habit-block">
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <span
+                      className="habit-icon"
+                      style={{
+                        background: habit.color,
+                        width: 28,
+                        height: 28,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "50%",
+                        color: "#fff",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      <FontAwesomeIcon icon={getHabitIcon(habit.icon)} />
+                    </span>
+                    <span style={{ fontWeight: 600 }}>{habit.name}</span>
+                  </div>
+                  <div className="analyze-heatmap">
+                    <div className="heatmap-row">
+                      <div className="heatmap-label"></div>
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                        <div key={d} className="heatmap-day-label">
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+                    {/* Build heatmap grid for the month */}
+                    {(() => {
+                      const { daysInMonth, month, year } = getMonthInfo();
+                      const grid = [];
+                      let day = 1;
+                      for (let week = 0; week < 6; week++) {
+                        const row = [];
+                        for (let dow = 0; dow < 7; dow++) {
+                          const date = new Date(year, month, day);
+                          if (
+                            (week === 0 && dow < new Date(year, month, 1).getDay()) ||
+                            day > daysInMonth
+                          ) {
+                            row.push(<div key={dow} className="heatmap-cell empty"></div>);
+                          } else {
+                            const dateStr = date.toISOString().split("T")[0];
+                            const completed =
+                              habitStats[habit.id]?.completions[dateStr] || 0;
+                            row.push(
+                              <div
+                                key={dow}
+                                className={`heatmap-cell ${
+                                  completed >= habit.goal ? "filled" : ""
+                                }`}
+                                title={`${dateStr}: ${completed}/${habit.goal}`}
+                              >
+                                {completed > 0 ? completed : ""}
+                              </div>
+                            );
+                            day++;
+                          }
+                        }
+                        grid.push(
+                          <div key={week} className="heatmap-row">
+                            <div className="heatmap-label"></div>
+                            {row}
+                          </div>
+                        );
+                      }
+                      return grid;
+                    })()}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
@@ -1209,7 +1298,6 @@ const Habits = ({ darkMode }) => {
                   </div>
                 </div>
               </div>
-
               <h4>Last 7 Days</h4> <br />
               <div className="weekly-progress">
                 <div className="weekly-chart">
@@ -1242,7 +1330,6 @@ const Habits = ({ darkMode }) => {
                   ))}
                 </div>
               </div>
-
               {selectedHabit.notes && (
                 <div className="habit-notes">
                   <h4>Notes</h4>

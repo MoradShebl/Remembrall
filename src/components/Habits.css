@@ -104,7 +104,6 @@
 .habit-details {
   display: flex;
   flex-direction: column;
-  min-width: 190px;
 }
 
 .habit-details h3 {
@@ -1104,4 +1103,50 @@
 .preset-btn:hover {
   background: var(--accent-color);
   color: var(--primary-color);
+}
+
+/* Add to your CSS file */
+.calendar-analyze-section {
+  margin-top: 2rem;
+  background: var(--modal-bg, #fff);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px #0001;
+}
+.analyze-habit-picker {
+  margin-bottom: 1rem;
+}
+.analyze-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+.heatmap-row {
+  display: flex;
+  gap: 2px;
+}
+.heatmap-day-label {
+  width: 28px;
+  text-align: center;
+  font-size: 0.8em;
+  color: #888;
+}
+.heatmap-cell {
+  width: 28px;
+  height: 28px;
+  background: #eee;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 28px;
+  font-size: 0.9em;
+  color: #b71c1c;
+}
+.heatmap-cell.filled {
+  background: #e91e63;
+  color: #fff;
+  font-weight: bold;
+}
+.heatmap-cell.empty {
+  background: transparent;
 }

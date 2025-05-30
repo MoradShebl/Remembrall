@@ -1174,7 +1174,6 @@ header {
 
 .settings-content {
   padding: 18px 24px 0 24px;
-  border-bottom: 1px solid var(--secondary-color, #f0f0f0);
 }
 
 .settings-item {
@@ -1602,4 +1601,8 @@ header {
 
 [data-theme="dark"] .add-button {
   color: var(--primary-dark-color);
+}
+
+.app-section-nav {
+  border: 2px solid var(--accent-color) !important;
 }
