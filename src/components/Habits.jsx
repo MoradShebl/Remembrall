@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import AdComponent from "./components/AdComponent.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
@@ -1024,6 +1025,7 @@ const Habits = ({ darkMode }) => {
               ))
             )}
           </div>
+          <AdComponent />
         </div>
       )}
 
