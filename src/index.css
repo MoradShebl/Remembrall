@@ -151,10 +151,6 @@ button:disabled {
   width: 100%;
 }
 
-.habits-container {
-  animation: fadeIn 0.5s var(--cubic-bezier) forwards;
-}
-
 .item-container {
   width: 90%;
   max-width: 800px;
