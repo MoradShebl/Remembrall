@@ -26,7 +26,7 @@ const SpeechRecognition = ({ onAddItem, onAddTime, speechLanguage, categories, a
   }, [isListening, text]);
 
   useEffect(() => {
-    text === "help" ? setShowHelp(true) : null
+    text === "help" || text === "Help" ? setShowHelp(true) : null
   }, [text]);
 
   // Use useCallback to memoize the handleCommand function
