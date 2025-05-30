@@ -105,10 +105,12 @@ h1 img {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(122, 129, 255, 0.4);
   }
+
   70% {
     transform: scale(1.1);
     box-shadow: 0 0 0 10px rgba(122, 129, 255, 0);
   }
+
   100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(122, 129, 255, 0);
@@ -145,13 +147,20 @@ button:disabled {
   overflow-x: hidden;
 }
 
+.recent-items-container {
+  width: 100%;
+}
+
+.habits-container {
+  animation: fadeIn 0.5s var(--cubic-bezier) forwards;
+}
+
 .item-container {
-  width: 300px;
-  max-width: 400px;
+  width: 90%;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px 10px 0px 0px;
   padding: 15px;
   padding-bottom: 0px;
@@ -159,6 +168,7 @@ button:disabled {
   min-height: calc(100vh - 61px);
   overflow: visible;
   margin: 0 auto;
+  animation: fadeIn 0.5s var(--cubic-bezier) forwards;
 }
 
 .item-container h2 {
@@ -417,20 +427,24 @@ button:disabled {
     flex-wrap: wrap;
   }
 }
+
 .item.rtl .item-info {
   flex-direction: row-reverse;
 }
-.up{
+
+.up {
   min-height: 76%;
   max-height: 450px;
   border-radius: 10px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
 /* RTL Support for Arabic */
 .item.rtl .item-info-header {
   direction: rtl;
 }
+
 .location-rtl {
   direction: rtl;
   display: flex;
@@ -477,7 +491,7 @@ button:disabled {
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(74,144,226,0.07);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.07);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -490,6 +504,7 @@ button:disabled {
 .add-button p {
   animation: forwards fadeIn 0.5s;
 }
+
 .add-button:hover {
   background: var(--hover-color);
 }
@@ -499,15 +514,18 @@ button:disabled {
   text-decoration: underline;
   transition: color 0.2s;
 }
+
 .settings-item a:hover {
   color: var(--hover-color);
 }
+
 @media (max-width: 600px) {
   .settings {
     width: 100vw;
     border-radius: 0;
     padding-bottom: 40px;
   }
+
   .settings-header,
   .settings-content {
     padding-left: 12px;
@@ -535,6 +553,7 @@ button:disabled {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -630,7 +649,7 @@ button:disabled {
   .location-wrapper {
     flex-wrap: nowrap;
   }
-  
+
   .location-wrapper input {
     flex: 1;
     min-width: 0;
@@ -659,6 +678,7 @@ button:disabled {
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     translate: 100px;
@@ -978,25 +998,39 @@ header {
   max-width: 95vw;
   height: 100vh;
   background: var(--primary-color, #fff);
-  box-shadow: -4px 0 24px rgba(0,0,0,0.13);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.13);
   z-index: 1002;
   padding: 0;
   display: flex;
   flex-direction: column;
-  animation: slideInSettings 0.3s cubic-bezier(.4,0,.2,1);
+  animation: slideInSettings 0.3s cubic-bezier(.4, 0, .2, 1);
   border-top-left-radius: 18px;
   border-bottom-left-radius: 18px;
   overflow-y: auto;
 }
 
 @keyframes slideOutSettings {
-  from { right: 0; opacity: 1; }
-  to { right: -400px; opacity: 0; }
+  from {
+    right: 0;
+    opacity: 1;
+  }
+
+  to {
+    right: -400px;
+    opacity: 0;
+  }
 }
 
 @keyframes slideInSettings {
-  from { right: -400px; opacity: 0; }
-  to { right: 0; opacity: 1; }
+  from {
+    right: -400px;
+    opacity: 0;
+  }
+
+  to {
+    right: 0;
+    opacity: 1;
+  }
 }
 
 .sett.item.deleting {
@@ -1021,13 +1055,14 @@ header {
 }
 
 .settings-closing {
-  animation: slideOutSettings 0.3s cubic-bezier(.4,0,.2,1) forwards;
+  animation: slideOutSettings 0.3s cubic-bezier(.4, 0, .2, 1) forwards;
 }
 
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -1037,6 +1072,7 @@ header {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(100%);
   }
@@ -1130,6 +1166,7 @@ header {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1139,9 +1176,11 @@ header {
   padding: 18px 24px 0 24px;
   border-bottom: 1px solid var(--secondary-color, #f0f0f0);
 }
+
 .settings-item {
   margin-bottom: 18px;
 }
+
 .settings-item h3 {
   margin: 0 0 7px 0;
   font-size: 1.08rem;
@@ -1159,23 +1198,27 @@ header {
 .add-cata {
   width: 100%;
 }
+
 .add-cata-screen {
   height: 250px;
   overflow: hidden;
   z-index: 10;
 }
+
 .show-categories {
   height: auto;
   overflow: scroll;
   display: flex;
   justify-content: flex-start;
 }
+
 .show-categories .header h3 {
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--accent-color);
   margin: 0;
 }
+
 .catagory-screen-button {
   padding: 5px;
   height: 30px;
@@ -1228,19 +1271,19 @@ header {
   color: white;
 }
 
-.cutom-theme{
+.cutom-theme {
   z-index: 1003;
 }
 
-.container{
+.container {
   height: 100vh;
 }
 
-.recent-items{
+.recent-items {
   height: 100%;
 }
 
-.block{
+.block {
   height: 100%;
 }
 
@@ -1268,6 +1311,7 @@ header {
   background-color: var(--accent-dark-color);
   color: var(--text-dark-color);
 }
+
 /* Core dark mode styles */
 [data-theme="dark"] {
   --primary-color: var(--primary-dark-color);
@@ -1482,13 +1526,14 @@ header {
   border-color: var(--accent-dark-color);
   box-shadow: 0 0 0 2px rgba(138, 144, 255, 0.3);
 }
+
 /* Mobile-specific styles */
 @media (max-width: 480px) {
   .item-container h2 {
     font-size: 1.4rem;
     margin-bottom: 15px;
   }
-  
+
   .item-info-header p {
     font-size: 0.9rem;
     max-width: 70%;
@@ -1496,33 +1541,33 @@ header {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+
   .add-button {
     padding: 8px 12px;
     font-size: 0.9rem;
   }
-  
+
   .catagory-emoji-wrapper {
     width: 30px;
     height: 30px;
   }
-  
+
   .dropdown button {
     font-size: 14px;
   }
-  
+
   .remove {
     width: 30px;
     height: 30px;
     padding: 7px;
   }
-  
+
   .location {
     width: 35px;
     height: 35px;
     padding: 8px;
   }
-  
+
   .time-informations-wrapper p {
     font-size: 0.85rem;
   }

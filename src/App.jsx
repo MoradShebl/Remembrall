@@ -9,7 +9,6 @@ import {
   faTrash,
   faPalette,
 } from "@fortawesome/free-solid-svg-icons";
-import logo from "./assets/logo svg.svg";
 import "./components/Habits.css";
 import "./components/AppSectionNav.css";
 
@@ -30,9 +29,16 @@ function App() {
   const [defaultHabitColor, setDefaultHabitColor] = useState("#4CAF50");
   const [defaultHabitGoal, setDefaultHabitGoal] = useState(1);
   const [showCompletedHabits, setShowCompletedHabits] = useState(true);
-  const [customAccent, setCustomAccent] = useState("#4a90e2");
-  const [customBackground, setCustomBackground] = useState("#fff");
+  const [customAccent, setCustomAccent] = useState(() => {
+    return localStorage.getItem("customAccent") || "#4a90e2";
+  });
+  const [customBackground, setCustomBackground] = useState(() => {
+    return localStorage.getItem("customBackground") || "#fff";
+  });
   const [showCustomTheme, setShowCustomTheme] = useState(false);
+  const [customSecondary, setCustomSecondary] = useState(() => {
+    return localStorage.getItem("customSecondary") || "#f8f8f8";
+  });
 
   const resetAllData = () => {
     if (
@@ -111,7 +117,11 @@ function App() {
       "--primary-color",
       customBackground
     );
-  }, [customAccent, customBackground]);
+    document.documentElement.style.setProperty("--secondary-color", customSecondary);
+    localStorage.setItem("customAccent", customAccent);
+    localStorage.setItem("customBackground", customBackground);
+    localStorage.setItem("customSecondary", customSecondary);
+  }, [customAccent, customBackground, customSecondary]);
 
   const toggleTheme = () => {
     setIsTransitioning(true);
@@ -517,6 +527,23 @@ function App() {
                     </div>
                   </div>
 
+                  <div className="color-picker-group">
+                    <label>Secondary Color</label>
+                    <div className="color-input">
+                      <input
+                        type="color"
+                        value={customSecondary}
+                        onChange={(e) => setCustomSecondary(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        value={customSecondary}
+                        onChange={(e) => setCustomSecondary(e.target.value)}
+                        placeholder="#000000"
+                      />
+                    </div>
+                  </div>
+
                   <div className="theme-presets">
                     <h3>Presets</h3>
                     <div className="preset-buttons">
@@ -556,6 +583,7 @@ function App() {
 
           {/* Keep both components mounted but toggle visibility */}
           <div
+            className="recent-items-container"
             style={{ display: activeSection === "items" ? "block" : "none" }}
           >
             <Recent
@@ -567,6 +595,7 @@ function App() {
           </div>
 
           <div
+            className="habits-container"
             style={{
               display: activeSection === "habits" ? "block" : "none",
               height: "100vh",
